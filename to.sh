@@ -45,8 +45,28 @@ function deployToHeroku {
 
 function deployToAws {
   echo "Server type: AWS"
+
   cd ${CONFIG_PATH}
+
+  # prevent building of mobile platforms
+  PLATFORMS=../../app/.meteor/platforms
+  PLATFORMS_BAK=${PLATFORMS}.bak
+
+  # backup platforms config
+  mv ${PLATFORMS} ${PLATFORMS_BAK}
+
+  cat > "${PLATFORMS}" <<- EOM
+browser
+server
+
+EOM
+
+  # deploy app
   mupx deploy
+
+  # get old platforms config back
+  rm -f ${PLATFORMS}
+  mv ${PLATFORMS_BAK} ${PLATFORMS}
 }
 
 function deployToGalaxy {
