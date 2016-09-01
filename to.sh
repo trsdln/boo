@@ -46,13 +46,14 @@ function deployToHeroku {
 function deployToAws {
   echo "Server type: AWS"
   cd ${CONFIG_PATH}
-  # todo: finish
-  #mupx deploy
+  mupx deploy
 }
 
 function deployToGalaxy {
   echo "Server type: Galaxy"
-  # todo: finish
+  # todo: add build in env variables to settings.json support
+  export DEPLOY_HOSTNAME
+  meteor deploy ${DOMAIN_NAME} --owner ${OWNER_ID} --settings ${CONFIG_PATH}/settings.json
 }
 
 function verifyDeployment {
