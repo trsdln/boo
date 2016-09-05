@@ -39,7 +39,7 @@ case "$1" in
     meteor debug --settings ${SETTINGS_PATH}
     ;;
   *)
-    echo "Starting browser app on ${LOCALHOST_URL}"
+    echo "Starting browser app on ${ROOT_URL}"
     meteor run --settings ${SETTINGS_PATH}
     ;;
 esac
