@@ -36,8 +36,8 @@ while [[ "$#" -gt 0 ]]; do
 
   case ${key} in
     --no-drop)
-    echo "No drop flag: YES"
     DROP_FLAG=""
+    echo "No drop flag: YES ${DROP_FLAG}"
     ;;
     --no-hook)
     echo "Don't execute post dump script: YES"

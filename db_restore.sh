@@ -24,6 +24,10 @@ while [[ "$#" -gt 0 ]]; do
     SERVER_TYPE="$2"
     shift # past value argument
     ;;
+    --no-drop)
+    echo "Prevent drop of remote database: ON"
+    PREVENT_DROP="YES"
+    ;;
     *)
       echo "Unknown option ${1}"      # unknown option
       exit 1
@@ -46,7 +50,6 @@ CONFIG_FOLDER=../config/${SERVER_TYPE}
 # first get confirmation... just in case :)
 echo "#############################################################"
 echo "# Restore you local database to [${MONGO_HOST}] ${SERVER_DESCRIPTION}?"
-echo "# Are you sure admin password wasn't resetted?!"
 echo "# Answer: yes/no"
 echo "#############################################################"
 
@@ -61,11 +64,13 @@ then
   echo "Making local database dump..."
   mongodump -h "${FROM_HOST}" -d "${FROM_DB_NAME}" -o "${DUMP_DIR}" > /dev/null
 
-  echo "Drop all collections on remote database before restore"
-  mongo "${MONGO_HOST}/${MONGO_DB}" -u "${MONGO_USER}" -p "${MONGO_PASSWORD}" --eval "db.getCollectionNames().forEach(function (n) {if (n != 'system.indexes') {db[n].drop();}});"
+  if [[ ${PREVENT_DROP} != "YES" ]]; then
+    echo "Drop all collections on remote database before restore"
+    mongo "${MONGO_HOST}/${MONGO_DB}" -u "${MONGO_USER}" -p "${MONGO_PASSWORD}" --eval "db.getCollectionNames().forEach(function (n) {if (n != 'system.indexes') {db[n].drop();}});"
+  fi
 
   echo "Restoring database from dump..."
-  mongorestore --db "${MONGO_DB}" -h "${MONGO_HOST}" -u "${MONGO_USER}" -p "${MONGO_PASSWORD}" --drop "${DUMP_DIR}/${FROM_DB_NAME}" > /dev/null
+  mongorestore --db "${MONGO_DB}" -h "${MONGO_HOST}" -u "${MONGO_USER}" -p "${MONGO_PASSWORD}" "${DUMP_DIR}/${FROM_DB_NAME}" > /dev/null
 
   kill $!
   echo
