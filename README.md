@@ -28,5 +28,6 @@ Supports:
  
 ## Todos: 
 
-[ ] write detailed documentation about each deployment platform
-[ ] add configuration examples
+- [ ] write detailed documentation about each deployment platform
+- [ ] add configuration examples
+- [ ] describe addtional keys for other commands
