@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # source common part
-. ${SCRIPT_SOURCE_DIR}/common.sh
+. ${1}/common.sh
 
 # addtional configuration
 . ${CONFIG_PATH}/../backup.conf

@@ -15,7 +15,7 @@ fi
 SCRIPT_ALIAS=$1
 
 ALL_ARGS="$@"
-SCRIPT_ARGS="${ALL_ARGS#* }" # remove script alias from args
+SCRIPT_ARGS="${SCRIPT_SOURCE_DIR} ${ALL_ARGS#* }" # remove script alias from args
 
 case ${SCRIPT_ALIAS} in
   version)
@@ -27,7 +27,7 @@ case ${SCRIPT_ALIAS} in
   ;;
 esac
 
-SCRIPT_FILE=${SCRIPT_SOURCE_DIR}/${SCRIPT_NAME}.sh
+SCRIPT_FILE=${SCRIPT_SOURCE_DIR}/lib/${SCRIPT_NAME}.sh
 
 if [[ -e ${SCRIPT_FILE} ]]; then
   ${SCRIPT_FILE} ${SCRIPT_ARGS}

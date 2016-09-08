@@ -5,31 +5,44 @@
 # directory to remote server
 #
 
-SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # source common part
-. ${SCRIPT_SOURCE_DIR}/common.sh
+. ${1}/common.sh
 
-#== local settings
+# local settings
 APP_LOCAL_PATH=$(pwd)
 FROM_HOST="localhost:27017"
 FROM_DB_NAME="meteor"
-DUMP_DIR="./.dump"
 
+DUMP_DIR="./.dump"
 DROP_FLAG='--drop'
 
+function printWarningMessage() {
+  local drop_enabled=$([[ ${DROP_FLAG} == "" ]] && echo "NO" || echo "YES")
+  echo ""
+  echo "######################################"
+  echo "# WARNING!!!                         #"
+  echo "# You may lost data at remote server #"
+  echo "######################################"
+  echo ""
+  echo "Server: ${SERVER_DESCRIPTION}"
+  echo "URL: ${ROOT_URL}"
+  echo "Mongo: ${MONGO_HOST}"
+  echo "Drop enabled: ${drop_enabled}"
+  echo ""
+  echo "Are you sure? (Enter 'yes' to continue)"
+}
 
 #parse script arguments
-while [[ "$#" -gt 1 ]]; do
+while [[ "$#" -gt 2 ]]; do
   key="$1"
 
   case $key in
     --no-drop)
-    echo "Prevent drop of remote database: ON"
     DROP_FLAG=""
     ;;
     *)
-      echo "Unknown option ${1}"      # unknown option
-      exit 1
+    echo "Unknown option: ${1}"
+    exit 1
     ;;
   esac
 
@@ -37,16 +50,14 @@ while [[ "$#" -gt 1 ]]; do
 done
 
 # first get confirmation... just in case :)
-echo "#############################################################"
-echo "# Restore you local database to [${MONGO_HOST}] ${SERVER_DESCRIPTION}?"
-echo "# Answer: yes/no"
-echo "#############################################################"
-
+printWarningMessage
 read CONFIRM
 
 if [[ ${CONFIRM} =~ ^yes$ ]]; then
   echo "Starting local database server... "
-  mongod --dbpath "${APP_LOCAL_PATH}/.meteor/local/db" > /dev/null & sleep 20
+  mongod --dbpath "${APP_LOCAL_PATH}/.meteor/local/db" > /dev/null &
+  MONGOD_PID=$!
+  sleep 20
 
   #make dump
   echo "Making local database dump..."
@@ -56,7 +67,7 @@ if [[ ${CONFIRM} =~ ^yes$ ]]; then
   mongorestore --quiet ${DROP_FLAG} --db "${MONGO_DB}" -h "${MONGO_HOST}" -u "${MONGO_USER}" \
                -p "${MONGO_PASSWORD}" "${DUMP_DIR}/${FROM_DB_NAME}" > /dev/null
 
-  kill $!
-  echo
-  echo "Done! Local database restored to [${MONGO_HOST}] ${SERVER_DESCRIPTION}."
+  kill ${MONGOD_PID}
+  echo ""
+  echo "Done! Local database restored to ${SERVER_DESCRIPTION} [${MONGO_HOST}]."
 fi

@@ -8,12 +8,11 @@
 # -v verbose mode (print all logs)
 #
 
-SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # source common part
-. ${SCRIPT_SOURCE_DIR}/common.sh
+. ${1}/common.sh
 
 
-DEST_DIR="./.dump"
+DUMP_ROOT_FOLDER="./.dump"
 DB_PATH=$(pwd)/.meteor/local/db
 DB_WAIT_TIME=10
 
@@ -25,21 +24,21 @@ OUTPUT_STREAM=/dev/null
 DROP_FLAG="--drop"
 
 #parse script arguments
-while [[ "$#" -gt 1 ]]; do
+while [[ "$#" -gt 2 ]]; do
   key="$1"
 
   case ${key} in
     --no-drop)
     DROP_FLAG=""
-    echo "No drop flag: YES ${DROP_FLAG}"
+    echo "Prevent database drop: YES"
     ;;
     --no-hook)
-    echo "Don't execute post dump script: YES"
     PREVENT_POST_HOOK="YES"
+    echo "Prevent post dump hook: YES"
     ;;
     -d|--dump)
-    echo "Use dump: YES"
     USE_DUMP="YES"
+    echo "Use local dump: YES"
     ;;
     -v|--verbose)
     OUTPUT_STREAM="/dev/stdout"
@@ -53,24 +52,34 @@ while [[ "$#" -gt 1 ]]; do
   shift # past argument or value
 done
 
-echo "Dumping database of '${SERVER_DESCRIPTION}'..."
+echo "Selected database of '${SERVER_DESCRIPTION}'"
 
+# remove old database instead of `meteor reset`
+echo "Removing local database..."
+rm -rf .meteor/local/db
+mkdir -p .meteor/local/db ${DUMP_ROOT_FOLDER}
 
 if [[ "${USE_DUMP}" != "YES" ]]; then
   # refresh dump
-  rm -rf "${DEST_DIR}/${MONGO_DB}"
+  rm -rf "${DUMP_ROOT_FOLDER}/${MONGO_DB}"
   echo "Making remote database dump. Please, wait..."
-  mongodump -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" -o "${DEST_DIR}" &> ${OUTPUT_STREAM}
+  mongodump -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" -o "${DUMP_ROOT_FOLDER}" &> ${OUTPUT_STREAM}
 fi
 
-# remove old database instead of `meteor reset`
-rm -rf .meteor/local/db
-mkdir -p .meteor/local/db ${DEST_DIR}
+DUMP_FOLDER="${DUMP_ROOT_FOLDER}/${MONGO_DB}"
+
+# check if dump exists
+if [[ ! -d ${DUMP_FOLDER} ]]; then
+  echo "Dump '${DUMP_FOLDER}' doesn't exists!"
+  exit 1
+fi
 
 echo "Starting local database ..."
-mongod --dbpath="${DB_PATH}" --port="${LOCAL_DB_PORT}" --storageEngine=mmapv1 --nojournal > ${OUTPUT_STREAM} & sleep ${DB_WAIT_TIME}
+mongod --dbpath="${DB_PATH}" --port="${LOCAL_DB_PORT}" --storageEngine=mmapv1 --nojournal > ${OUTPUT_STREAM} &
+MONGOD_PID=$!
+sleep ${DB_WAIT_TIME}
 
-mongorestore --host=${LOCAL_DB_HOST} --port=${LOCAL_DB_PORT} --db=${LOCAL_DB_NAME} ${DROP_FLAG} "${DEST_DIR}/${MONGO_DB}" &> ${OUTPUT_STREAM}
+mongorestore --host=${LOCAL_DB_HOST} --port=${LOCAL_DB_PORT} --db=${LOCAL_DB_NAME} ${DROP_FLAG} "${DUMP_FOLDER}" &> ${OUTPUT_STREAM}
 
 if [[ ${PREVENT_POST_HOOK} != "YES" ]]; then
   POST_DUMP_HOOK_SCRIPT=${CONFIG_PATH}/post-dump.js
@@ -81,7 +90,7 @@ if [[ ${PREVENT_POST_HOOK} != "YES" ]]; then
   fi
 fi
 
-kill $! #kill db server
+kill ${MONGOD_PID}
 
 echo
-echo "Congratulaitons! Your database is copied."
+echo "The database is successfully copied"

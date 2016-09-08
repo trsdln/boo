@@ -12,10 +12,8 @@
 # Google Play should be always signed with the same key, stored in `~/.keysore`.
 #
 
-
-SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # source common part
-. ${SCRIPT_SOURCE_DIR}/common.sh
+. ${1}/common.sh
 
 # apply additional configuration
 # provides APP_NAME, APK_OUTPUT_FOLDER, ANDROID_HOME, ANDROID_BUILD_TOOLS_VERSION,
@@ -24,6 +22,16 @@ SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 # common functions
+function printHelp() {
+  echo 'Meteor App Build Script'
+  echo ''
+  echo 'Options:'
+  echo '-v|--verbose enable verbose mode (print all logs)'
+  echo '-c|--cleanup cleanup .meteor/local directory'
+  echo '-h|--help show this message'
+  echo ''
+}
+
 function beep() {
   echo -ne '\007'
 }
@@ -51,7 +59,7 @@ SIGNED_APK_NAME="${APP_NAME}_${MOBILE_APP_VERSION}.apk"
 OUTPUT_STREAM=/dev/null
 
 #parse script arguments
-while [[ "$#" -gt 1 ]]; do
+while [[ "$#" -gt 2 ]]; do
   key="$1"
 
   case $key in
@@ -63,13 +71,7 @@ while [[ "$#" -gt 1 ]]; do
     CLEANUP="YES"
     ;;
     -h|--help)
-    echo 'Meteor App Build Script'
-    echo ''
-    echo 'Options:'
-    echo '-v|--verbose enable verbose mode (print all logs)'
-    echo '-c|--cleanup cleanup .meteor/local directory'
-    echo '-h|--help show this message'
-    echo ''
+    printHelp
     exit 0
     ;;
     *)
@@ -89,11 +91,10 @@ else
   IS_FORCE_SSL_ENABLED='NO'
 fi
 
-echo "==== Building summary ===="
-echo "* mobile server: ${ROOT_URL}"
-echo "* mobile app version: ${MOBILE_APP_VERSION}"
-echo "* force-ssl is enabled: ${IS_FORCE_SSL_ENABLED}"
-echo "=========================="
+echo "Building summary"
+echo "mobile server: ${ROOT_URL}"
+echo "mobile app version: ${MOBILE_APP_VERSION}"
+echo "force-ssl is enabled: ${IS_FORCE_SSL_ENABLED}"
 echo
 echo "Press ANY key to continue"
 read -rsn1
@@ -149,7 +150,7 @@ ${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}/zipalign 4 ${UNSIGNED
 rm -f ${APK_OUTPUT_FOLDER}/${SIGNED_APK_NAME}
 cp ${SIGNED_APK_NAME} ${APK_OUTPUT_FOLDER}
 
-echo "APKs saved to ${APK_OUTPUT_FOLDER}"
+echo "APK was saved to ${APK_OUTPUT_FOLDER}"
 
 echo "Install APK on device (CTRL+C=Cancel)?"
 beep # signal that confirmations required
@@ -161,4 +162,4 @@ adb uninstall ${MOBILE_APP_ID}
 echo "Install new version:"
 adb install "${APK_OUTPUT_FOLDER}/${SIGNED_APK_NAME}"
 
-echo "DONE"
+echo "Done!"

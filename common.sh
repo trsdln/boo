@@ -20,12 +20,12 @@ error() {
 trap 'error ${LINENO}' ERR
 
 
-if [ -z ${1+x} ]; then
+if [ -z ${2+x} ]; then
    echo "You should specify server using first argument"
    exit 1
 fi
 
-SERVER_NAME=$1
+SERVER_NAME=$2
 CONFIG_PATH=../config/${SERVER_NAME}
 
 # source config

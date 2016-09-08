@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-
-SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # source common part
-. ${SCRIPT_SOURCE_DIR}/common.sh
+. ${1}/common.sh
 
 
 SETTINGS_PATH=${CONFIG_PATH}/settings.json
+RUN_MODE=$3
 
 if [ -z ${ROOT_URL+x} ]; then
    MOBILE_SERVER_ARG=""
@@ -15,7 +14,7 @@ else
    MOBILE_SERVER_ARG="--mobile-server ${ROOT_URL}"
 fi
 
-case "$2" in
+case ${RUN_MODE} in
   android)
     echo "Staring Android (emulator) app on ${ROOT_URL}"
     meteor run android --settings ${SETTINGS_PATH} ${MOBILE_SERVER_ARG}
