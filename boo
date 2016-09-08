@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-# ensure we are at Meteor's project root
-if [ ! -d ../config ] || [ ! -d .meteor ]; then
-  CUR_DIR=$(pwd)
-  echo "Error: '${CUR_DIR}' is not a project's root directory or '../config' folder is missing!"
-  exit 1
-fi
-
 
 BOO_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -34,6 +27,13 @@ case ${SCRIPT_ALIAS} in
   SCRIPT_NAME=${SCRIPT_ALIAS}
   ;;
 esac
+
+# ensure we are at Meteor's project root
+if [ ! -d ../config ] || [ ! -d .meteor ]; then
+  CUR_DIR=$(pwd)
+  echo "Error: '${CUR_DIR}' is not a project's root directory or '../config' folder is missing!"
+  exit 1
+fi
 
 SCRIPT_FILE=${SCRIPT_SOURCE_DIR}/lib/${SCRIPT_NAME}.sh
 
