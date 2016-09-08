@@ -9,7 +9,13 @@ Should be executed from meteor project's root directory (where `.meteor` located
 
 Looks for configurations at `../config/<configuration-name>`
 
-## `boo deploy <configuration-name>`
+## boo deploy
+
+Usage:
+
+```
+boo deploy <configuration-name>
+```
 
 Supports:
 
@@ -26,8 +32,9 @@ Supports:
 * `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
 * `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database).
  
-## Todos: 
+## Future work
 
-- [ ] write detailed documentation about each deployment platform
+- [ ] custom scripts
+- [ ] describe deployment configuration for each platform in docs
 - [ ] add configuration examples
-- [ ] describe addtional keys for other commands
+- [ ] describe additional keys for other commands
