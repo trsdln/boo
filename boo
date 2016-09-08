@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
-SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BOO_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [[ ${BOO_SCRIPT_LOCATION} == '/usr/local/bin' ]]; then
+  # installed as npm package
+  # currently I have no idea how to get it dynamically
+  SCRIPT_SOURCE_DIR='/usr/local/lib/node_modules/boo'
+else
+  # used locally
+  SCRIPT_SOURCE_DIR=${BOO_SCRIPT_LOCATION}
+fi
+
 
 SCRIPT_ALIAS=$1
 
@@ -10,6 +20,9 @@ SCRIPT_ARGS="${ALL_ARGS#* }" # remove script alias from args
 case ${SCRIPT_ALIAS} in
     run)
     ${SCRIPT_SOURCE_DIR}/run.sh ${SCRIPT_ARGS}
+    ;;
+    build)
+    ${SCRIPT_SOURCE_DIR}/build.sh ${SCRIPT_ARGS}
     ;;
     deploy)
     ${SCRIPT_SOURCE_DIR}/to.sh ${SCRIPT_ARGS}

@@ -21,7 +21,7 @@ trap 'error ${LINENO}' ERR
 
 
 if [ -z ${1+x} ]; then
-   echo "You should specify server using as first argument"
+   echo "You should specify server using first argument"
    exit 1
 fi
 
