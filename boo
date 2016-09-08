@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+# ensure we are at Meteor's project root
+if [ ! -d ../config ] || [ ! -d .meteor ]; then
+  CUR_DIR=$(pwd)
+  echo "Error: '${CUR_DIR}' is not a project's root directory or '../config' folder is missing!"
+  exit 1
+fi
+
+
 BOO_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ ${BOO_SCRIPT_LOCATION} == '/usr/local/bin' ]]; then
@@ -15,7 +23,7 @@ fi
 SCRIPT_ALIAS=$1
 
 ALL_ARGS="$@"
-SCRIPT_ARGS="${SCRIPT_SOURCE_DIR} ${ALL_ARGS#* }" # remove script alias from args
+SCRIPT_ARGS="${ALL_ARGS#* }" # remove script alias from args
 
 case ${SCRIPT_ALIAS} in
   version)
@@ -29,9 +37,20 @@ esac
 
 SCRIPT_FILE=${SCRIPT_SOURCE_DIR}/lib/${SCRIPT_NAME}.sh
 
-if [[ -e ${SCRIPT_FILE} ]]; then
-  ${SCRIPT_FILE} ${SCRIPT_ARGS}
+if [[ -f ${SCRIPT_FILE} ]]; then
+  ${SCRIPT_FILE} ${SCRIPT_SOURCE_DIR} ${SCRIPT_ARGS}
 else
-  echo "Unknown command ${SCRIPT_ALIAS}"
-  exit 1
+  # source custom actions
+  ACTIONS_CONF=../config/boo-actions.conf
+  if [[ -f ${ACTIONS_CONF} ]]; then
+    . ${ACTIONS_CONF}
+  fi
+
+  ALIAS_TYPE=$(type -t ${SCRIPT_ALIAS})
+  if [[ ${ALIAS_TYPE} == 'function' ]]; then
+    "${SCRIPT_ALIAS}" ${SCRIPT_ARGS}
+  else
+    echo "Unknown action: '${SCRIPT_ALIAS}'"
+    exit 1
+  fi
 fi

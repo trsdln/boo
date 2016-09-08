@@ -1,13 +1,24 @@
 # Meteor Deployment Toolkit
 
-Multiple environment deployment script + additional useful scripts that
-work at context of specific server.
+Features: 
+
+* Multiple deployment environment support
+* Multiple configurations support
+* Additional useful actions that work at context of specific server
+* Custom actions support
 
 Super useful for lazy people: configured once - use any time.
 
-Should be executed from meteor project's root directory (where `.meteor` located).
+Should be executed from meteor project's root directory (where `.meteor` is located).
 
 Looks for configurations at `../config/<configuration-name>`
+
+## Syntax
+
+```
+boo <action> [configuration-name] [addtional_keys]
+```
+
 
 ## boo deploy
 
@@ -31,10 +42,19 @@ Supports:
 * `boo db-restore <configuration-name>` restore database at `.meteor/local/db` to remote server;
 * `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
 * `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database).
+
+## Custom actions
+
+You can define your own actions as bash functions at `./conf/boo-actions.conf`.
+
+#### Tested on:
+
+* Mac OS X
+
  
 ## Future work
 
-- [ ] custom scripts
+- [x] custom scripts
 - [ ] describe deployment configuration for each platform in docs
 - [ ] add configuration examples
 - [ ] describe additional keys for other commands
