@@ -1,0 +1,19 @@
+{
+  "name": "boo",
+  "version": "0.0.1",
+  "description": "Meteor Deployment Toolkit",
+  "main": "boo.sh",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trsdln/boo.git"
+  },
+  "author": "Taras D.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trsdln/boo/issues"
+  },
+  "homepage": "https://github.com/trsdln/boo#readme"
+}

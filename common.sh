@@ -15,9 +15,6 @@ error() {
   fi
     echo ""
 
-  echo "Reset DB operation failed!"
-  echo "Use verbose mode (-v) for details"
-
   exit "${code}"
 }
 trap 'error ${LINENO}' ERR

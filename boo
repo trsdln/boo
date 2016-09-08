@@ -7,9 +7,10 @@ SCRIPT_ALIAS=$1
 ALL_ARGS="$@"
 SCRIPT_ARGS="${ALL_ARGS#* }" # remove script alias from args
 
-echo "ARGS: ${SCRIPT_ARGS}"
-
 case ${SCRIPT_ALIAS} in
+    run)
+    ${SCRIPT_SOURCE_DIR}/run.sh ${SCRIPT_ARGS}
+    ;;
     deploy)
     ${SCRIPT_SOURCE_DIR}/to.sh ${SCRIPT_ARGS}
     ;;
