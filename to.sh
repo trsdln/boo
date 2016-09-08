@@ -4,19 +4,10 @@
 # Main deployment script
 #
 
-SERVER_NAME=$1
-CONFIG_PATH=../config/${SERVER_NAME}
+SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# source common part
+. ${SCRIPT_SOURCE_DIR}/common.sh
 
-# source config
-CONFIG_FILE=${CONFIG_PATH}/deploy.conf
-
-if [ -e ${CONFIG_FILE} ]; then
-  echo "Deploy to ${SERVER_NAME}"
-  . ${CONFIG_FILE}
-else
-  echo "Error: Server configuration '${CONFIG_FILE}' not found!"
-  exit 1
-fi
 
 echo " - ${SERVER_DESCRIPTION}"
 

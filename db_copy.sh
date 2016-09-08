@@ -1,12 +1,17 @@
 #!/bin/bash
 
 #
-# Arguments
+# Arguments:
+# server_type - server type
 # -d use previously created dump
-# -s <server_type>
 # -p prevent password reset for admin
 # -v verbose mode (print all logs)
 #
+
+SCRIPT_SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# source common part
+. ${SCRIPT_SOURCE_DIR}/common.sh
+
 
 DEST_DIR="./.dump"
 DB_PATH=$(pwd)/.meteor/local/db
@@ -19,19 +24,8 @@ LOCAL_DB_NAME=meteor
 OUTPUT_STREAM=/dev/null
 DROP_FLAG="--drop"
 
-#error handling
-handleError() {
-  echo ""
-  echo "Reset DB operation failed!"
-  echo "Use verbose mode (-v) for details"
-  exit 1
-}
-
-trap 'handleError' ERR
-
-
 #parse script arguments
-while [[ "$#" -gt 0 ]]; do
+while [[ "$#" -gt 1 ]]; do
   key="$1"
 
   case ${key} in
@@ -50,10 +44,6 @@ while [[ "$#" -gt 0 ]]; do
     -v|--verbose)
     OUTPUT_STREAM="/dev/stdout"
     ;;
-    -s|--server)
-    SERVER_TYPE="$2"
-    shift # past value argument
-    ;;
     *)
     echo "Unknown option ${1}"      # unknown option
     exit 1
@@ -63,14 +53,6 @@ while [[ "$#" -gt 0 ]]; do
   shift # past argument or value
 done
 
-if [ -z ${SERVER_TYPE+x} ]; then
-   echo "You should specify server using '-s' parameter"
-   exit 1
-fi
-
-# source config file with MONGO DB credentials
-CONFIG_FOLDER=../config/${SERVER_TYPE}
-. ${CONFIG_FOLDER}/deploy.conf
 echo "Dumping database of '${SERVER_DESCRIPTION}'..."
 
 
@@ -83,7 +65,7 @@ fi
 
 # remove old database instead of `meteor reset`
 rm -rf .meteor/local/db
-mkdir -p .meteor/local/db
+mkdir -p .meteor/local/db ${DEST_DIR}
 
 echo "Starting local database ..."
 mongod --dbpath="${DB_PATH}" --port="${LOCAL_DB_PORT}" --storageEngine=mmapv1 --nojournal > ${OUTPUT_STREAM} & sleep ${DB_WAIT_TIME}
@@ -91,7 +73,7 @@ mongod --dbpath="${DB_PATH}" --port="${LOCAL_DB_PORT}" --storageEngine=mmapv1 --
 mongorestore --host=${LOCAL_DB_HOST} --port=${LOCAL_DB_PORT} --db=${LOCAL_DB_NAME} ${DROP_FLAG} "${DEST_DIR}/${MONGO_DB}" &> ${OUTPUT_STREAM}
 
 if [[ ${PREVENT_POST_HOOK} != "YES" ]]; then
-  POST_DUMP_HOOK_SCRIPT=${CONFIG_FOLDER}/post-dump.js
+  POST_DUMP_HOOK_SCRIPT=${CONFIG_PATH}/post-dump.js
 
   if [[ -f ${POST_DUMP_HOOK_SCRIPT} ]]; then
     echo "Executing post dump hook script ..."
