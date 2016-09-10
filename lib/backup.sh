@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
-# source common part
-. ${1}/common.sh
+function backup {
+  local server_name=$1
+  source_deploy_conf ${server_name}
 
-# addtional configuration
-. ${CONFIG_PATH}/../backup.conf
+  # additional configuration
+  source_config_file 'backup.conf'
 
+  local dump_folder="./.dump/${MONGO_DB}"
 
-DUMP_FOLDER="./.dump/${MONGO_DB}"
+  local date_str=`date +%Y-%m-%d`
+  local backup_file_name="${MONGO_DB}-${date_str}.zip"
 
-DATE_STR=`date +%Y-%m-%d`
-BACKUP_FILE_NAME="${MONGO_DB}-${DATE_STR}.zip"
+  echo "Making backup ${backup_file_name}..."
+  zip -r ${backup_file_name}  ${dump_folder}
 
-echo "Making backup ${BACKUP_FILE_NAME}..."
-zip -r ${BACKUP_FILE_NAME}  ${DUMP_FOLDER}
+  mkdir -p ${OUT_FOLDER}
+  mv ${backup_file_name}  ${OUT_FOLDER}/.
 
-mkdir -p ${OUT_FOLDER}
-mv ${BACKUP_FILE_NAME}  ${OUT_FOLDER}/.
-
-echo "Saved as ${OUT_FOLDER}/${BACKUP_FILE_NAME}"
+  echo "Saved as ${OUT_FOLDER}/${backup_file_name}"
+}
