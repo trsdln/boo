@@ -1,42 +1,41 @@
 #!/usr/bin/env bash
 
-#
-# Builds app
-#
 
-#
-# To generate new key
-# $ keytool -genkey -alias "HospoHero" -keyalg RSA -keysize 2048 -validity 10000
-#
-# Note: keystore backup is required. APK uploaded to
-# Google Play should be always signed with the same key, stored in `~/.keysore`.
-#
-
-# source common part
-. ${1}/common.sh
-
-# apply additional configuration
-# provides APP_NAME, APK_OUTPUT_FOLDER, ANDROID_HOME, ANDROID_BUILD_TOOLS_VERSION,
-# KEYSTORE_PASSWORD, PRIVATE_KEY_NAME, PRIVATE_KEY_PASSWORD
-. ${CONFIG_PATH}/../build.conf
-
+BUILD_FOLDER="../build"
+OUTPUT_STREAM=/dev/null
 
 # common functions
-function printHelp() {
-  echo 'Meteor App Build Script'
-  echo ''
-  echo 'Options:'
-  echo '-v|--verbose enable verbose mode (print all logs)'
-  echo '-c|--cleanup cleanup .meteor/local directory'
-  echo '-h|--help show this message'
-  echo ''
+
+function print_build_summary {
+  cat << EOF
+
+Building summary
+mobile server: ${ROOT_URL}
+mobile app version: $(extract_mobile_config_value 'version')
+force-ssl is enabled: $(grep -Fxq "force-ssl" ./.meteor/packages && echo 'YES' || echo 'NO')
+
+Press ANY key to continue
+
+EOF
 }
 
-function beep() {
+function build_help {
+  cat << EOF
+Builds Meteor app for production
+
+boo build server_name [-v|--verbose] [-c|--cleanup]
+
+Options:
+-v|--verbose  - enable verbose mode (print all logs)
+-c|--cleanup  - cleanup .meteor/local directory
+EOF
+}
+
+function beep {
   echo -ne '\007'
 }
 
-function extractConfigValue() {
+function extract_mobile_config_value {
   local valueKey=$1
   local value=$(cat mobile-config.js | grep "${valueKey}:" | tail -n 1)
   value=${value#*\'}
@@ -44,122 +43,108 @@ function extractConfigValue() {
   echo ${value}
 }
 
-# basic build settings
-BUILD_FOLDER="../build"
-UNSIGNED_APK_NAME="release-unsigned.apk"
-ALTERNATIVE_APK_PATH="./project/build/outputs/apk/android-armv7-release-unsigned.apk"
+function post_build_android {
+  local unsigned_apk_name="release-unsigned.apk"
+  local alternative_apk_path="./project/build/outputs/apk/android-armv7-release-unsigned.apk"
+  
+  local signed_apk_name="${APP_NAME}_$(extract_mobile_config_value 'version').apk"
 
-# extract some mobile config settings
-MOBILE_APP_VERSION=$(extractConfigValue 'version')
-MOBILE_APP_ID=$(extractConfigValue 'id')
-MOBILE_APP_NAME=$(extractConfigValue 'name')
+  cd "${BUILD_FOLDER}/android"
 
-SIGNED_APK_NAME="${APP_NAME}_${MOBILE_APP_VERSION}.apk"
+  # provide APK file if it is missed
+  if [ ! -f ${unsigned_apk_name} ]; then
+    cp ${alternative_apk_path} ./${unsigned_apk_name}
+    echo "Missing unsigned APK, so it was taken from ${alternative_apk_path}"
+  fi
 
-OUTPUT_STREAM=/dev/null
+  # remove old signed APK
+  if [ -f ${signed_apk_name} ]; then
+    rm -f ${signed_apk_name}
+  fi
 
-#parse script arguments
-while [[ "$#" -gt 2 ]]; do
-  key="$1"
+  # sign APK
+  jarsigner -keystore ../../config/keystore.jks \
+     -storepass "${KEYSTORE_PASSWORD}" -keypass "${PRIVATE_KEY_PASSWORD}" \
+     -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+     ${unsigned_apk_name} ${APP_NAME} > ${OUTPUT_STREAM}
 
-  case $key in
-    -v|--verbose)
-    OUTPUT_STREAM="/dev/stdout"
-    BUILD_VERBOSE_FLAG="--verbose"
-    ;;
-    -c|--clean)
-    CLEANUP="YES"
-    ;;
-    -h|--help)
-    printHelp
-    exit 0
-    ;;
-    *)
-    echo "Unknown option ${1}"
-    exit 1
-    ;;
-  esac
+  ${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}/zipalign 4 \
+     ${unsigned_apk_name} ${signed_apk_name} > ${OUTPUT_STREAM}
 
-  shift # past argument or value
-done
+  rm -f ${APK_OUTPUT_FOLDER}/${signed_apk_name}
+  cp ${signed_apk_name} ${APK_OUTPUT_FOLDER}
 
+  echo "APK was saved to ${APK_OUTPUT_FOLDER}"
+
+  echo "Install APK on device (CTRL+C=Cancel)?"
+  beep # signal that confirmations required
+  read -rsn1
+
+  echo "Remove old APK..."
+  local mobile_app_id=$(extract_mobile_config_value 'id')
+  adb uninstall ${mobile_app_id}
+
+  echo "Install new version..."
+  adb install "${APK_OUTPUT_FOLDER}/${signed_apk_name}"
+}
 
 
-if grep -Fxq "force-ssl" ./.meteor/packages; then
-  IS_FORCE_SSL_ENABLED='YES'
-else
-  IS_FORCE_SSL_ENABLED='NO'
-fi
+function build {
+  local server_name=$1
+  source_deploy_conf ${server_name}
 
-echo "Building summary"
-echo "mobile server: ${ROOT_URL}"
-echo "mobile app version: ${MOBILE_APP_VERSION}"
-echo "force-ssl is enabled: ${IS_FORCE_SSL_ENABLED}"
-echo
-echo "Press ANY key to continue"
-read -rsn1
+  # additional configuration
+  source_config_file 'build.conf'
 
-echo "Remove old build in ${BUILD_FOLDER}"
-rm -rf ${BUILD_FOLDER}
+  local cleanup=""
+  local build_verbose_flag=""
 
-if [[ ${CLEANUP} == 'YES' ]]; then
+  # parse rest of function arguments
+  while [[ $(($#-1)) -gt 0 ]]; do
+    local key="$2"
+
+    case ${key} in
+      -v|--verbose)
+      OUTPUT_STREAM=/dev/stdout
+      build_verbose_flag="--verbose"
+      ;;
+      -c|--clean)
+      cleanup="YES"
+      ;;
+      *)
+      echo "Unknown option ${key}"
+      exit 1
+      ;;
+    esac
+
+    shift # past argument or value
+  done
+
+  print_build_summary
+  read -rsn1
+
+  if [[ -d ${BUILD_FOLDER} ]]; then
+    echo "Remove old build in ${BUILD_FOLDER}"
+    rm -rf ${BUILD_FOLDER}
+  fi
+
   # we cannot cleanup .meter/local each time because of https://github.com/meteor/meteor/issues/6756
-  echo "Remove folders in ./.meteor/local"
-  rm -rf .meter/local/.build* .meter/local/build .meter/local/bundler-cache .meter/local/cordova-build
-#else
-#  # Fixes Meteor#6756 based on:
-#  # https://github.com/meteor/meteor/issues/6756#issuecomment-243409677
-#  ANDROID_BUILD_PATH="${BUILD_FOLDER}/android/project"
-#  mkdir -p ${ANDROID_BUILD_PATH}
-#  cp -a .meteor/local/cordova-build/platforms/android/build "${ANDROID_BUILD_PATH}"
-fi
+  if [[ ${cleanup} == 'YES' ]]; then
+    . $(prepend_with_boo_root 'lib/clean.sh')
+    clean
+  fi
 
-# build project for production
-meteor build ${BUILD_FOLDER} ${BUILD_VERBOSE_FLAG} --mobile-settings=${CONFIG_PATH}/settings.json --server ${ROOT_URL}
+  # build project for production
+  meteor build ${BUILD_FOLDER} ${build_verbose_flag} \
+         --mobile-settings=../config/${server_name}/settings.json --server ${ROOT_URL}
 
+  # iOS
+  # open generated project inside Xcode
+  local mobile_app_name=$(extract_mobile_config_value 'name')
+  open -a Xcode "${BUILD_FOLDER}/ios/project/${mobile_app_name}.xcodeproj"
 
-# ==== iOS
+  # Android
+  post_build_android
 
-#open generated project inside Xcode
-open -a Xcode "${BUILD_FOLDER}/ios/project/${MOBILE_APP_NAME}.xcodeproj"
-
-
-# ==== Android
-
-# sign APK
-cd "${BUILD_FOLDER}/android"
-
-# provide APK file if it is missed
-if [ ! -f ${UNSIGNED_APK_NAME} ]; then
-  cp ${ALTERNATIVE_APK_PATH} ./${UNSIGNED_APK_NAME}
-  echo "Missing unsigned APK, so it was taken from ${ALTERNATIVE_APK_PATH}"
-fi
-
-# remove old signed APK
-if [ -f ${SIGNED_APK_NAME} ]; then
-  rm -f ${SIGNED_APK_NAME}
-fi
-
-beep
-jarsigner -keystore ../../config/keystore.jks -storepass "${KEYSTORE_PASSWORD}" -keypass "${PRIVATE_KEY_PASSWORD}" -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-   ${UNSIGNED_APK_NAME} ${APP_NAME} > ${OUTPUT_STREAM}
-
-${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}/zipalign 4 ${UNSIGNED_APK_NAME} ${SIGNED_APK_NAME} > ${OUTPUT_STREAM}
-
-# save to shared folder on Dropbox
-rm -f ${APK_OUTPUT_FOLDER}/${SIGNED_APK_NAME}
-cp ${SIGNED_APK_NAME} ${APK_OUTPUT_FOLDER}
-
-echo "APK was saved to ${APK_OUTPUT_FOLDER}"
-
-echo "Install APK on device (CTRL+C=Cancel)?"
-beep # signal that confirmations required
-read -rsn1
-
-echo "Remove old APK:"
-adb uninstall ${MOBILE_APP_ID}
-
-echo "Install new version:"
-adb install "${APK_OUTPUT_FOLDER}/${SIGNED_APK_NAME}"
-
-echo "Done!"
+  echo "Done!"
+}

@@ -1,56 +1,61 @@
 #!/usr/bin/env bash
 
+function get_boo_root_path {
+  local boo_script_location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  local boo_root_path
 
-BOO_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-if [[ ${BOO_SCRIPT_LOCATION} == '/usr/local/bin' ]]; then
-  # installed as npm package
-  # currently I have no idea how to get it dynamically
-  SCRIPT_SOURCE_DIR='/usr/local/lib/node_modules/boo'
-else
-  # used locally
-  SCRIPT_SOURCE_DIR=${BOO_SCRIPT_LOCATION}
-fi
-
-
-SCRIPT_ALIAS=$1
-
-ALL_ARGS="$@"
-SCRIPT_ARGS="${ALL_ARGS#* }" # remove script alias from args
-
-case ${SCRIPT_ALIAS} in
-  version)
-  echo $(cat ${SCRIPT_SOURCE_DIR}/package.json | grep 'version')
-  exit 0
-  ;;
-  *)
-  SCRIPT_NAME=${SCRIPT_ALIAS}
-  ;;
-esac
-
-# ensure we are at Meteor's project root
-if [ ! -d ../config ] || [ ! -d .meteor ]; then
-  CUR_DIR=$(pwd)
-  echo "Error: '${CUR_DIR}' is not a project's root directory or '../config' folder is missing!"
-  exit 1
-fi
-
-SCRIPT_FILE=${SCRIPT_SOURCE_DIR}/lib/${SCRIPT_NAME}.sh
-
-if [[ -f ${SCRIPT_FILE} ]]; then
-  ${SCRIPT_FILE} ${SCRIPT_SOURCE_DIR} ${SCRIPT_ARGS}
-else
-  # source custom actions
-  ACTIONS_CONF=../config/boo-actions.conf
-  if [[ -f ${ACTIONS_CONF} ]]; then
-    . ${ACTIONS_CONF}
+  if [[ ${boo_script_location} == '/usr/local/bin' ]]; then
+    # installed as npm package
+    # currently I have no idea how to get it dynamically
+    boo_root_path='/usr/local/lib/node_modules/boo'
+  else
+    # used locally
+    boo_root_path=${boo_script_location}
   fi
 
-  ALIAS_TYPE=$(type -t ${SCRIPT_ALIAS})
-  if [[ ${ALIAS_TYPE} == 'function' ]]; then
-    "${SCRIPT_ALIAS}" ${SCRIPT_ARGS}
+  echo ${boo_root_path}
+}
+
+
+function source_action {
+  local boo_root=$1
+  local action_name=$2
+
+  local action_file=${boo_root}/lib/${action_name}.sh
+
+  if [[ -f ${action_file} ]]; then
+    . ${action_file}
   else
-    echo "Unknown action: '${SCRIPT_ALIAS}'"
+    # source user's custom actions
+    source_config_file 'boo-actions.conf' 'silent'
+  fi
+}
+
+
+function execute_action {
+  local boo_root=$1
+  local action_name=$2
+  local action_args=$3
+
+  source_action ${boo_root} ${action_name}
+
+  [[ -z ${NO_METEOR_ROOT+x} ]] && ensure_meteor_root_dir
+
+  if [[ "$(type -t ${action_name})" == 'function' ]]; then
+    ${action_name} ${action_args} # execute action
+  else
+    echo "Unknown action: '${action_name}'"
     exit 1
   fi
-fi
+}
+
+
+BOO_ROOT_PATH=$(get_boo_root_path)
+
+# source common functions
+. ${BOO_ROOT_PATH}/common.sh
+
+# split action name and action arguments
+ACTION_NAME=$1
+ALL_ARGS="$@"
+execute_action ${BOO_ROOT_PATH} ${ACTION_NAME} "${ALL_ARGS#* }"

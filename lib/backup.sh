@@ -1,21 +1,31 @@
 #!/usr/bin/env bash
 
-# source common part
-. ${1}/common.sh
+function backup_help {
+  cat << EOF
+Backups already cached database dump from '.dump' directory
 
-# addtional configuration
-. ${CONFIG_PATH}/../backup.conf
+boo backup
+EOF
+}
 
 
-DUMP_FOLDER="./.dump/${MONGO_DB}"
+function backup {
+  local server_name=$1
+  source_deploy_conf ${server_name}
 
-DATE_STR=`date +%Y-%m-%d`
-BACKUP_FILE_NAME="${MONGO_DB}-${DATE_STR}.zip"
+  # additional configuration
+  source_config_file 'backup.conf'
 
-echo "Making backup ${BACKUP_FILE_NAME}..."
-zip -r ${BACKUP_FILE_NAME}  ${DUMP_FOLDER}
+  local dump_folder="./.dump/${MONGO_DB}"
 
-mkdir -p ${OUT_FOLDER}
-mv ${BACKUP_FILE_NAME}  ${OUT_FOLDER}/.
+  local date_str=`date +%Y-%m-%d`
+  local backup_file_name="${MONGO_DB}-${date_str}.zip"
 
-echo "Saved as ${OUT_FOLDER}/${BACKUP_FILE_NAME}"
+  echo "Making backup ${backup_file_name}..."
+  zip -r ${backup_file_name}  ${dump_folder}
+
+  mkdir -p ${OUT_FOLDER}
+  mv ${backup_file_name}  ${OUT_FOLDER}/.
+
+  echo "Saved as ${OUT_FOLDER}/${backup_file_name}"
+}
