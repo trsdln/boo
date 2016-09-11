@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# Builds Meteor app for production
-#
-
-#
-# To generate new key
-# $ keytool -genkey -alias "HospoHero" -keyalg RSA -keysize 2048 -validity 10000
-#
-# Note: keystore backup is required. APK uploaded to
-# Google Play should be always signed with the same key, stored in `~/.keysore`.
-#
 
 BUILD_FOLDER="../build"
 OUTPUT_STREAM=/dev/null
@@ -32,13 +21,13 @@ EOF
 
 function build_help {
   cat << EOF
-Meteor App Build Script
+Builds Meteor app for production
+
+boo build server_name [-v|--verbose] [-c|--cleanup]
 
 Options:
--v|--verbose enable verbose mode (print all logs)
--c|--cleanup cleanup .meteor/local directory
--h|--help show this message
-
+-v|--verbose  - enable verbose mode (print all logs)
+-c|--cleanup  - cleanup .meteor/local directory
 EOF
 }
 
