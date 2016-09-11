@@ -19,8 +19,8 @@ OUTPUT_STREAM=/dev/null
 
 function print_build_summary {
   cat << EOF
-Building summary
 
+Building summary
 mobile server: ${ROOT_URL}
 mobile app version: $(extract_mobile_config_value 'version')
 force-ssl is enabled: $(grep -Fxq "force-ssl" ./.meteor/packages && echo 'YES' || echo 'NO')
@@ -32,8 +32,8 @@ EOF
 
 function print_help {
   cat << EOF
-Meteor App Build Script
 
+Meteor App Build Script
 Options:
 -v|--verbose enable verbose mode (print all logs)
 -c|--cleanup cleanup .meteor/local directory
@@ -110,10 +110,10 @@ function build {
   local cleanup=""
   local build_verbose_flag=""
 
-  #parse script arguments
-  while [[ "$#" -gt 2 ]]; do
-    local key="$1"
-    
+  # parse rest of function arguments
+  while [[ $(($#-1)) -gt 0 ]]; do
+    local key="$2"
+
     case ${key} in
       -v|--verbose)
       OUTPUT_STREAM=/dev/stdout
@@ -127,7 +127,7 @@ function build {
       exit 0
       ;;
       *)
-      echo "Unknown option ${1}"
+      echo "Unknown option ${key}"
       exit 1
       ;;
     esac
