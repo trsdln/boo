@@ -30,10 +30,10 @@ Press ANY key to continue
 EOF
 }
 
-function print_help {
+function build_help {
   cat << EOF
-
 Meteor App Build Script
+
 Options:
 -v|--verbose enable verbose mode (print all logs)
 -c|--cleanup cleanup .meteor/local directory
@@ -121,10 +121,6 @@ function build {
       ;;
       -c|--clean)
       cleanup="YES"
-      ;;
-      -h|--help)
-      print_help
-      exit 0
       ;;
       *)
       echo "Unknown option ${key}"
