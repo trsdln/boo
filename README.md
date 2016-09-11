@@ -41,7 +41,8 @@ Supports:
 * `boo db-copy <configuration-name>` copy server's database to `.meteor/local/db`;
 * `boo db-restore <configuration-name>` restore database at `.meteor/local/db` to remote server;
 * `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
-* `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database).
+* `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database);
+* `boo help <action-name>` prints short help about specified action.
 
 ## Custom actions
 
