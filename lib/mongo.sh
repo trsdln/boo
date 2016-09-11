@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 
-# source common part
-. ${1}/common.sh
+function mongo_help {
+  cat << EOF
+Open Mongo shell to remote server
 
+boo mongo server_name
+EOF
+}
 
-echo "Connecting to database of ${SERVER_NAME}..."
-mongo ${MONGO_URL}
+function mongo {
+  local server_name=$1
+  source_deploy_conf ${server_name}
+
+  echo "Connecting to database of ${server_name}..."
+  $(which mongo) ${MONGO_URL}
+}
+

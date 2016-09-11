@@ -1,51 +1,52 @@
 #!/usr/bin/env bash
 
-#
-# Main deployment script
-#
+function deploy_help {
+  cat << EOF
+Deploys application to specified server
 
-# source common part
-. ${1}/common.sh
+boo deploy server_name
+EOF
+}
 
-
-echo " - ${SERVER_DESCRIPTION}"
-
-function deployToHeroku {
+function deploy_to_heroku {
   echo "Server type: Heroku"
-  BRANCH_NAME=`git rev-parse --abbrev-ref HEAD`
+  local server_name=$1
+  local branch_name=`git rev-parse --abbrev-ref HEAD`
 
   # upsert Heroku remote
-  if git remote -v | grep "${SERVER_NAME}" > /dev/null; then
-    git remote set-url ${SERVER_NAME} ${HEROKU_REMOTE}
+  if git remote -v | grep "${server_name}" > /dev/null; then
+    git remote set-url ${server_name} ${HEROKU_REMOTE}
   else
-    git remote add ${SERVER_NAME} ${HEROKU_REMOTE}
+    git remote add ${server_name} ${HEROKU_REMOTE}
   fi
 
   # set root url
-  heroku config:add ROOT_URL="${ROOT_URL}" -r ${SERVER_NAME}
+  heroku config:add ROOT_URL="${ROOT_URL}" -r ${server_name}
 
   # set Mongo url
-  heroku config:add MONGO_URL="${MONGO_URL}" -r ${SERVER_NAME}
+  heroku config:add MONGO_URL="${MONGO_URL}" -r ${server_name}
 
   # set Meteor settings
-  heroku config:add METEOR_SETTINGS="$(cat ${CONFIG_PATH}/settings.json)" -r ${SERVER_NAME}
+  heroku config:add METEOR_SETTINGS="$(cat ../config/${server_name}/settings.json)" -r ${server_name}
 
-  git push -f ${SERVER_NAME} ${BRANCH_NAME}:master
+  git push -f ${server_name} ${branch_name}:master
 }
 
-function deployToAws {
-  echo "Server type: AWS"
 
-  cd ${CONFIG_PATH}
+function deploy_to_aws {
+  echo "Server type: AWS"
+  local server_name=$1
+
+  cd ../config/${server_name}
 
   # prevent building of mobile platforms
-  PLATFORMS=../../app/.meteor/platforms
-  PLATFORMS_BAK=${PLATFORMS}.bak
+  local platforms_file=../../app/.meteor/platforms
+  local platforms_file_backup=${platforms_file}.bak
 
   # backup platforms config
-  mv ${PLATFORMS} ${PLATFORMS_BAK}
+  mv ${platforms_file} ${platforms_file_backup}
 
-  cat > "${PLATFORMS}" <<- EOM
+  cat > "${platforms_file}" <<- EOM
 browser
 server
 
@@ -55,39 +56,50 @@ EOM
   mupx deploy
 
   # get old platforms config back
-  rm -f ${PLATFORMS}
-  mv ${PLATFORMS_BAK} ${PLATFORMS}
+  rm -f ${platforms_file}
+  mv ${platforms_file_backup} ${platforms_file}
 }
 
-function deployToGalaxy {
+
+function deploy_to_galaxy {
+  local server_name=$1
   echo "Server type: Galaxy"
   # todo: add build in env variables to settings.json support
   export DEPLOY_HOSTNAME
-  meteor deploy ${DOMAIN_NAME} --owner ${OWNER_ID} --settings ${CONFIG_PATH}/settings.json
+  meteor deploy ${DOMAIN_NAME} --owner ${OWNER_ID} --settings ../config/${server_name}/settings.json
 }
 
-function verifyDeployment {
+
+function verify_deployment {
   echo "Verifying deployment...";
   sleep ${VERIFY_TIMEOUT}
   curl -o /dev/null -s ${ROOT_URL} && echo "OK" || echo "FAILED"
 }
 
-case ${SERVER_TYPE} in
-  heroku)
-    deployToHeroku
-    verifyDeployment
-  ;;
-  aws)
-    deployToAws
-  ;;
-  galaxy)
-    deployToGalaxy
-    verifyDeployment
-  ;;
-  *)
-    echo "Unknown server type: ${SERVER_TYPE}"
-    exit 1
-  ;;
-esac
 
-echo "Deployment finished";
+function deploy {
+  local server_name=$1
+  source_deploy_conf ${server_name}
+
+  echo " - ${SERVER_DESCRIPTION}"
+
+  case ${SERVER_TYPE} in
+    heroku)
+      deploy_to_heroku ${server_name}
+      verify_deployment
+    ;;
+    aws)
+      deploy_to_aws ${server_name}
+    ;;
+    galaxy)
+      deploy_to_galaxy ${server_name}
+      verify_deployment
+    ;;
+    *)
+      echo "Unknown server type: ${SERVER_TYPE}"
+      exit 1
+    ;;
+  esac
+
+  echo "Deployment finished";
+}
