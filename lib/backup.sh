@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+function backup_help {
+  cat << EOF
+Backups already cached database dump from '.dump' directory
+
+boo backup
+EOF
+}
+
+
 function backup {
   local server_name=$1
   source_deploy_conf ${server_name}

@@ -2,7 +2,30 @@
 
 NO_METEOR_ROOT=1
 
-# prints help for specified action
+function help_help {
+  cat << EOF
+boo help help
+WAT?
+
+Prints help for specified action
+
+boo help action_name
+
+Build-in actions:
+deploy
+run
+backup
+build
+clean
+db-copy
+db-restore
+mongo
+help
+version
+EOF
+}
+
+
 function help {
   local action_name=$1
 
