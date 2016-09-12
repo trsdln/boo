@@ -6,8 +6,7 @@ function get_boo_root_path {
 
   if [[ ${boo_script_location} == '/usr/local/bin' ]]; then
     # installed as npm package
-    # currently I have no idea how to get it dynamically
-    boo_root_path='/usr/local/lib/node_modules/boo'
+    boo_root_path="$(npm config get prefix)/lib/node_modules/boo"
   else
     # used locally
     boo_root_path=${boo_script_location}
