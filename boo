@@ -4,12 +4,12 @@ function get_boo_root_path {
   local boo_script_location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
   local boo_root_path
 
-  if [[ ${boo_script_location} == '/usr/local/bin' ]]; then
+  if [ -f "${boo_script_location}/common.sh" ]; then
+    # not npm package - used locally
+    boo_root_path=${boo_script_location}
+  else
     # installed as npm package
     boo_root_path="$(npm config get prefix)/lib/node_modules/boo"
-  else
-    # used locally
-    boo_root_path=${boo_script_location}
   fi
 
   echo ${boo_root_path}
