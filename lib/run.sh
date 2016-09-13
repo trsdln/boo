@@ -35,12 +35,8 @@ function run {
       meteor run android-device --settings ${settings_path} ${MOBILE_SERVER_ARG}
       ;;
     ios)
-      echo "Staring iOS (emulator) app on ${ROOT_URL}"
+      echo "Opening iOS app in Xcode on ${ROOT_URL}"
       meteor run ios --settings ${settings_path} ${MOBILE_SERVER_ARG}
-      ;;
-    ios-device)
-      echo "Staring iOS (device) app on ${ROOT_URL}"
-      meteor run ios-device --settings ${settings_path} ${MOBILE_SERVER_ARG}
       ;;
     debug)
       echo "Starting browser app in debug mode"
