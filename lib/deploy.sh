@@ -81,7 +81,7 @@ function deploy {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  echo " - ${SERVER_DESCRIPTION}"
+  echo " - ${SERVER_DESCRIPTION} [${ROOT_URL}]"
 
   case ${SERVER_TYPE} in
     heroku)
