@@ -8,20 +8,24 @@ DUMP_ROOT_DIR="./.dump"
 function print_restore_status {
   local drop_flag=$1
   local drop_enabled=$([[ ${drop_flag} == "" ]] && echo "NO" || echo "YES")
-  cat << EOF
+  local _db_restore_status_msg
 
+  read -r -d '' _db_restore_status_msg << EOF
+${COLOR_ERROR}${TEXT_BOLD}
 ######################################
 # WARNING!!!                         #
 # You may lost data at remote server #
 ######################################
-
+${COLOR_DEFAULT}
 Server: ${SERVER_DESCRIPTION}
-URL: ${ROOT_URL}
+URL: ${TEXT_UNDERLINE}${ROOT_URL}${COLOR_DEFAULT}
 Mongo: ${MONGO_HOST}
-Drop enabled: ${drop_enabled}
+Drop enabled: ${TEXT_BOLD}${COLOR_ERROR}${drop_enabled}${COLOR_DEFAULT}
 
-Are you sure? (Enter 'yes' to continue)
+Are you sure? (Enter 'yes' to continue):
 EOF
+
+  printf "${_db_restore_status_msg} "
 }
 
 function db-restore_help {
@@ -56,7 +60,7 @@ function db-restore {
       output_stream=/dev/stdout
       ;;
       *)
-      echo "Unknown option: ${key}"
+      echo_error "Unknown option: ${key}"
       exit 1
       ;;
     esac
@@ -66,6 +70,7 @@ function db-restore {
 
   # first get confirmation... just in case :)
   print_restore_status ${drop_flag}
+
   read CONFIRM
 
   if [[ ${CONFIRM} =~ ^yes$ ]]; then
@@ -87,6 +92,6 @@ function db-restore {
     mongorestore ${drop_flag} --db "${MONGO_DB}" -h "${MONGO_HOST}" -u "${MONGO_USER}" \
       -p "${MONGO_PASSWORD}" "${DUMP_ROOT_DIR}/${FROM_DB_NAME}"
 
-    echo "Done! Local database restored to ${SERVER_DESCRIPTION} [${MONGO_HOST}]."
+    echo_success "Done! Local database restored to ${SERVER_DESCRIPTION} [${MONGO_HOST}]."
   fi
 }

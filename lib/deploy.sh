@@ -8,8 +8,12 @@ boo deploy server_name
 EOF
 }
 
+function print_server_type {
+  printf "Server type: ${COLOR_SUCCESS}${1}${COLOR_DEFAULT}\n"
+}
+
 function deploy_to_heroku {
-  echo "Server type: Heroku"
+  print_server_type 'Heroku'
   local server_name=$1
   local branch_name=`git rev-parse --abbrev-ref HEAD`
 
@@ -34,7 +38,7 @@ function deploy_to_heroku {
 
 
 function deploy_to_aws {
-  echo "Server type: AWS"
+  print_server_type 'AWS'
   local server_name=$1
 
   cd ../config/${server_name}
@@ -63,7 +67,7 @@ EOM
 
 function deploy_to_galaxy {
   local server_name=$1
-  echo "Server type: Galaxy"
+  print_server_type 'Galaxy'
   # todo: add build in env variables to settings.json support
   export DEPLOY_HOSTNAME
   meteor deploy ${DOMAIN_NAME} --owner ${OWNER_ID} --settings ../config/${server_name}/settings.json
@@ -71,9 +75,9 @@ function deploy_to_galaxy {
 
 
 function verify_deployment {
-  echo "Verifying deployment...";
+  printf "Verifying deployment...\t";
   sleep ${VERIFY_TIMEOUT}
-  curl -o /dev/null -s ${ROOT_URL} && echo "OK" || echo "FAILED"
+  curl -o /dev/null -s ${ROOT_URL} && echo_success "OK" || echo_error "FAILED"
 }
 
 
@@ -96,10 +100,10 @@ function deploy {
       verify_deployment
     ;;
     *)
-      echo "Unknown server type: ${SERVER_TYPE}"
+      echo_error "Unknown server type: ${SERVER_TYPE}"
       exit 1
     ;;
   esac
 
-  echo "Deployment finished";
+  echo_success "Deployment finished";
 }

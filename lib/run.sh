@@ -27,23 +27,23 @@ function run {
 
   case ${run_mode} in
     android)
-      echo "Staring Android (emulator) app on ${ROOT_URL}"
+      echo_success "Staring Android (emulator) app on ${TEXT_UNDERLINE}${ROOT_URL}"
       meteor run android --settings ${settings_path} ${MOBILE_SERVER_ARG}
       ;;
     android-device)
-      echo "Staring Android (device) app on ${ROOT_URL}"
+      echo_success "Staring Android (device) app on ${TEXT_UNDERLINE}${ROOT_URL}"
       meteor run android-device --settings ${settings_path} ${MOBILE_SERVER_ARG}
       ;;
     ios)
-      echo "Opening iOS app in Xcode on ${ROOT_URL}"
+      echo_success "Opening iOS app in Xcode on ${TEXT_UNDERLINE}${ROOT_URL}"
       meteor run ios --settings ${settings_path} ${MOBILE_SERVER_ARG}
       ;;
     debug)
-      echo "Starting browser app in debug mode"
+      echo_success "Starting browser app in debug mode"
       meteor debug --settings ${settings_path}
       ;;
     local|*)
-      echo "Starting browser app locally"
+      echo_success "Starting browser app locally"
       meteor run --settings ${settings_path}
       ;;
   esac

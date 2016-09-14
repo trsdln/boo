@@ -54,7 +54,7 @@ function post_build_android {
   # provide APK file if it is missed
   if [ ! -f ${unsigned_apk_name} ]; then
     cp ${alternative_apk_path} ./${unsigned_apk_name}
-    echo "Missing unsigned APK, so it was taken from ${alternative_apk_path}"
+    echo_warning "Missing unsigned APK, so it was taken from ${alternative_apk_path}"
   fi
 
   # remove old signed APK
@@ -74,7 +74,7 @@ function post_build_android {
   rm -f ${APK_OUTPUT_FOLDER}/${signed_apk_name}
   cp ${signed_apk_name} ${APK_OUTPUT_FOLDER}
 
-  echo "APK was saved to ${APK_OUTPUT_FOLDER}"
+  echo_success "APK was saved to ${APK_OUTPUT_FOLDER}"
 
   echo "Install APK on device (CTRL+C=Cancel)?"
   beep # signal that confirmations required
@@ -112,7 +112,7 @@ function build {
       cleanup="YES"
       ;;
       *)
-      echo "Unknown option ${key}"
+      echo_error "Unknown option ${key}"
       exit 1
       ;;
     esac
@@ -146,5 +146,5 @@ function build {
   # Android
   post_build_android
 
-  echo "Done!"
+  echo_success "Done!"
 }

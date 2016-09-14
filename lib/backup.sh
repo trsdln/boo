@@ -27,5 +27,5 @@ function backup {
   mkdir -p ${OUT_FOLDER}
   mv ${backup_file_name}  ${OUT_FOLDER}/.
 
-  echo "Saved as ${OUT_FOLDER}/${backup_file_name}"
+  echo_success "Saved as ${OUT_FOLDER}/${backup_file_name}"
 }

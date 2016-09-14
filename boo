@@ -43,7 +43,7 @@ function execute_action {
   if [[ "$(type -t ${action_name})" == 'function' ]]; then
     ${action_name} ${action_args} # execute action
   else
-    echo "Unknown action: '${action_name}'"
+    echo_error "Unknown action: '${action_name}'"
     exit 1
   fi
 }

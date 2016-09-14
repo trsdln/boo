@@ -54,7 +54,7 @@ function db-copy {
       output_stream="/dev/stdout"
       ;;
       *)
-      echo "Unknown option ${key}"
+      echo_error "Unknown option ${key}"
       exit 1
       ;;
     esac
@@ -62,7 +62,7 @@ function db-copy {
     shift # past argument or value
   done
 
-  echo "Selected database of '${SERVER_DESCRIPTION}'"
+  printf "Selected database of '${COLOR_SUCCESS}${SERVER_DESCRIPTION}${COLOR_DEFAULT}'\n"
 
   # remove old database instead of `meteor reset`
   echo "Removing local database..."
@@ -81,7 +81,7 @@ function db-copy {
 
   # check if dump exists
   if [[ ! -d ${dump_folder} ]]; then
-    echo "Dump '${dump_folder}' doesn't exists!"
+    echo_error "Dump '${dump_folder}' doesn't exists!"
     exit 1
   fi
 
@@ -107,5 +107,5 @@ function db-copy {
 
   kill ${mongod_pid}
 
-  echo "Database is successfully copied!"
+  echo_success "Database is successfully copied!"
 }
