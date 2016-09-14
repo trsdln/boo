@@ -1,6 +1,6 @@
 {
   "name": "boo",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Meteor Deployment Toolkit",
   "main": "boo.sh",
   "bin": {
