@@ -36,7 +36,7 @@ function run {
       ;;
     ios)
       echo_success "Opening iOS app in Xcode on ${TEXT_UNDERLINE}${ROOT_URL}"
-      meteor run ios --settings ${settings_path} ${MOBILE_SERVER_ARG}
+      meteor run ios-device --settings ${settings_path} ${MOBILE_SERVER_ARG}
       ;;
     debug)
       echo_success "Starting browser app in debug mode"
