@@ -85,8 +85,15 @@ function db-copy {
     exit 1
   fi
 
+  # find out if current release supports MongoDB's WiredTiger storage engine
+  local storage_engine_option="--storageEngine=mmapv1"
+  if grep -q "METEOR@1.4" ./.meteor/release; then
+    echo_success "Using WiredTiger storage engine"
+    storage_engine_option=""
+  fi
+
   echo "Starting local database ..."
-  mongod --dbpath="${local_db_path}" --port="${LOCAL_DB_PORT}" --storageEngine=mmapv1 \
+  mongod --dbpath="${local_db_path}" --port="${LOCAL_DB_PORT}" ${storage_engine_option} \
     --nojournal > ${output_stream} &
 
   local mongod_pid=$!
