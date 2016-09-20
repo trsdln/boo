@@ -12,7 +12,7 @@ function print_build_summary {
 Building summary
 mobile server: ${ROOT_URL}
 mobile app version: $(extract_mobile_config_value 'version')
-force-ssl is enabled: $(grep -Fxq "force-ssl" ./.meteor/packages && echo 'YES' || echo 'NO')
+force-ssl is enabled: $(grep -q "force-ssl" ./.meteor/packages && echo 'YES' || echo 'NO')
 
 Press ANY key to continue
 
