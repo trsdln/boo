@@ -48,6 +48,7 @@ function post_build_android {
   local alternative_apk_path="./project/build/outputs/apk/android-armv7-release-unsigned.apk"
   
   local signed_apk_name="${APP_NAME}_$(extract_mobile_config_value 'version').apk"
+  local mobile_app_id=$(extract_mobile_config_value 'id')
 
   cd "${BUILD_FOLDER}/android"
 
@@ -81,7 +82,6 @@ function post_build_android {
   read -rsn1
 
   echo "Remove old APK..."
-  local mobile_app_id=$(extract_mobile_config_value 'id')
   adb uninstall ${mobile_app_id}
 
   echo "Install new version..."
