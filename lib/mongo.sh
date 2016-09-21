@@ -17,4 +17,3 @@ function mongo {
   # "which" prevents self invocation
   $(which mongo) ${MONGO_URL}
 }
-
