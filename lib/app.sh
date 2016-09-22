@@ -15,7 +15,7 @@ function app {
     cd ${app_dir}
     local all_args="$@"
     printf "Executing action for '${COLOR_SUCCESS}${app_name}${COLOR_DEFAULT}' app\n"
-    boo "${all_args#* }"
+    boo ${all_args#* }
   else
     echo_error "Application '${app_name}' doesn't exist!";
     exit 1;
