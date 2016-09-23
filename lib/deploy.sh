@@ -12,17 +12,20 @@ function print_server_type {
   printf "Server type: ${COLOR_SUCCESS}${1}${COLOR_DEFAULT}\n"
 }
 
+function _upsert_git_remote {
+  local remote_name=$1
+  local remote_url=$2
+  local set_method=$(git remote -v | grep -q "${remote_name}" && echo 'set-url' || echo 'add')
+  git remote ${set_method} ${remote_name} ${remote_url}
+}
+
 function deploy_to_heroku {
   print_server_type 'Heroku'
   local server_name=$1
   local branch_name=`git rev-parse --abbrev-ref HEAD`
 
   # upsert Heroku remote
-  if git remote -v | grep "${server_name}" > /dev/null; then
-    git remote set-url ${server_name} ${HEROKU_REMOTE}
-  else
-    git remote add ${server_name} ${HEROKU_REMOTE}
-  fi
+  _upsert_git_remote ${server_name} ${HEROKU_REMOTE}
 
   # set root url
   heroku config:add ROOT_URL="${ROOT_URL}" -r ${server_name}
