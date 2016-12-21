@@ -72,6 +72,7 @@ function post_build_android {
   ${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}/zipalign 4 \
      ${unsigned_apk_name} ${signed_apk_name} > ${OUTPUT_STREAM}
 
+  mkdir -p ${APK_OUTPUT_FOLDER}
   rm -f ${APK_OUTPUT_FOLDER}/${signed_apk_name}
   cp ${signed_apk_name} ${APK_OUTPUT_FOLDER}
 
