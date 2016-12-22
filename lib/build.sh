@@ -69,6 +69,10 @@ function post_build_android {
      -verbose -sigalg SHA1withRSA -digestalg SHA1 \
      ${unsigned_apk_name} ${APP_NAME} > ${OUTPUT_STREAM}
 
+  if [ -z "${ANDROID_HOME}" ]; then
+    echo_danger "Error: Cannot find Android SDK - \$ANDROID_HOME is not defined!"
+  fi
+
   ${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}/zipalign 4 \
      ${unsigned_apk_name} ${signed_apk_name} > ${OUTPUT_STREAM}
 
