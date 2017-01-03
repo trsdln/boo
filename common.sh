@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-COLOR_SUCCESS='\e[92m'
+COLOR_SUCCESS='\e[34m'
 COLOR_WARNING='\e[33m'
 COLOR_ERROR='\e[31m'
 COLOR_DEFAULT='\E(B\E[m'
@@ -23,6 +23,12 @@ function echo_error {
   printf "${COLOR_ERROR}${1}${COLOR_DEFAULT}\n"
 }
 
+function test_echo_colors {
+  echo_success "success"
+  echo_warning "warning"
+  echo_danger "danger"
+  echo_error "error"
+}
 
 # error handling
 function on_error {
