@@ -78,7 +78,7 @@ function deploy_to_galaxy {
 
 
 function verify_deployment {
-  printf "Verifying deployment...\t";
+  printf "Verifying deployment in ${COLOR_SUCCESS}${VERIFY_TIMEOUT}${COLOR_DEFAULT} seconds...\t";
   sleep ${VERIFY_TIMEOUT}
   curl -o /dev/null -s ${ROOT_URL} && echo_success "OK" || echo_error "FAILED"
 }
