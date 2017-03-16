@@ -93,6 +93,26 @@ function post_build_android {
   adb install "${APK_OUTPUT_FOLDER}/${signed_apk_name}"
 }
 
+function sync_missing_assets {
+  local sync_from=$1
+  local sync_to=$2
+
+  if [[ -d "${sync_from}" ]]; then
+    rsync -a -v "${sync_from}/." "${sync_to}/."
+  fi
+}
+
+function post_build_ios {
+  local mobile_app_name=$(extract_mobile_config_value 'name')
+  local ios_project_path="${BUILD_FOLDER}/ios/project"
+
+  # open generated project inside Xcode
+  open -a Xcode "${ios_project_path}/${mobile_app_name}.xcodeproj"
+
+  local ios_project_files="${ios_project_path}/${mobile_app_name}"
+  sync_missing_assets ./resources/ios-missing-icons/. "${ios_project_files}/Images.xcassets/AppIcon.appiconset"
+  sync_missing_assets ./resources/ios-missing-splash/. "${ios_project_files}/Images.xcassets/LaunchImage.launchimage"
+}
 
 function build {
   local server_name=$1
@@ -144,9 +164,7 @@ function build {
          --mobile-settings=../config/${server_name}/settings.json --server ${ROOT_URL}
 
   # iOS
-  # open generated project inside Xcode
-  local mobile_app_name=$(extract_mobile_config_value 'name')
-  open -a Xcode "${BUILD_FOLDER}/ios/project/${mobile_app_name}.xcodeproj"
+  post_build_ios
 
   # Android
   post_build_android
