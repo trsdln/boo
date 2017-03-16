@@ -98,7 +98,7 @@ function sync_missing_assets {
   local sync_to=$2
 
   if [[ -d "${sync_from}" ]]; then
-    echo_success "Syncing assets from ${sync_from}"
+    echo_success "Syncing assets from '${sync_from}'"
     rsync -a -v "${sync_from}/." "${sync_to}/."
   fi
 }
@@ -107,13 +107,13 @@ function post_build_ios {
   local mobile_app_name=$(extract_mobile_config_value 'name')
   local ios_project_path="${BUILD_FOLDER}/ios/project"
 
+  local ios_project_files="${ios_project_path}/${mobile_app_name}"
+  sync_missing_assets ./resources/ios-missing-icons "${ios_project_files}/Images.xcassets/AppIcon.appiconset"
+  sync_missing_assets ./resources/ios-missing-splash "${ios_project_files}/Images.xcassets/LaunchImage.launchimage"
+
   # open generated project inside Xcode
   echo_success "Opening app at Xcode"
   open -a Xcode "${ios_project_path}/${mobile_app_name}.xcodeproj"
-
-  local ios_project_files="${ios_project_path}/${mobile_app_name}"
-  sync_missing_assets ./resources/ios-missing-icons/. "${ios_project_files}/Images.xcassets/AppIcon.appiconset"
-  sync_missing_assets ./resources/ios-missing-splash/. "${ios_project_files}/Images.xcassets/LaunchImage.launchimage"
 }
 
 function build {
