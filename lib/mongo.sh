@@ -14,6 +14,8 @@ function mongo {
 
   echo "Connecting to database of ${server_name}..."
 
+  local first_replica_set_host=${MONGO_HOST%,*}
+
   # "which" prevents self invocation
-  $(which mongo) ${MONGO_URL}
+  $(which mongo) ${MONGO_CUSTOM_FLAGS} ${first_replica_set_host}/${MONGO_DB} -u ${MONGO_USER} -p ${MONGO_PASSWORD}
 }
