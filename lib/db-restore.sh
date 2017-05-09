@@ -87,10 +87,9 @@ function db-restore {
 
     echo "Restoring database from dump..."
 
-    # --quiet
-    # &> ${output_stream}
-    mongorestore ${drop_flag} ${MONGO_CUSTOM_FLAGS} --db "${MONGO_DB}" -h "${MONGO_HOST}" -u "${MONGO_USER}" \
-      -p "${MONGO_PASSWORD}" "${DUMP_ROOT_DIR}/${FROM_DB_NAME}"
+    mongorestore "mongodb://${MONGO_HOST}/${MONGO_DB}${MONGO_URL_QUERY}" \
+      ${MONGO_CUSTOM_FLAGS} ${drop_flag} -u ${MONGO_USER} -p ${MONGO_PASSWORD} \
+      "${DUMP_ROOT_DIR}/${FROM_DB_NAME}"
 
     echo_success "Done! Local database restored to ${SERVER_DESCRIPTION} [${MONGO_HOST}]."
   fi
