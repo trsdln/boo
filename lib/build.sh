@@ -113,7 +113,7 @@ function post_build_ios {
 
   # open generated project inside Xcode
   echo_success "Opening app at Xcode"
-  open -a Xcode "${ios_project_path}/${mobile_app_name}.xcodeproj"
+  open -a Xcode "${ios_project_path}/${mobile_app_name}.xcworkspace"
 }
 
 function build {
