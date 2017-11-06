@@ -79,7 +79,7 @@ function post_build_android {
   rm -f ${APK_OUTPUT_FOLDER}/${signed_apk_name}
   cp ${signed_apk_name} ${APK_OUTPUT_FOLDER}
 
-  echo_success "APK was saved to ${APK_OUTPUT_FOLDER}"
+  echo_success "APK was saved to ${APK_OUTPUT_FOLDER} (PWD: $(pwd))"
 
   echo "Install APK on device (CTRL+C=Cancel)?"
   beep # signal that confirmations required
