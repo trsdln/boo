@@ -13,6 +13,25 @@ android|android-device|ios|ios-device|debug|local
 EOF
 }
 
+
+function _parse_key_parameters {
+  while [[ $# -gt 1 ]]
+  do
+    key="$1"
+
+    case $key in
+        -p|--port)
+          PORT="$2"
+          shift # past argument
+          ;;
+        *)
+          # unknown option
+        ;;
+    esac
+      shift # past argument or value
+  done
+}
+
 function run {
   local server_name=$1
   source_deploy_conf ${server_name}
@@ -22,7 +41,7 @@ function run {
 
   PORT="3000"
 
-  parse_key_parameters $@
+  _parse_key_parameters $@
 
   if [ -z ${ROOT_URL+x} ]; then
      MOBILE_SERVER_ARG=""

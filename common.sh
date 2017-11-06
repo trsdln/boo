@@ -86,21 +86,3 @@ function prepend_with_boo_root {
   local local_path=$1
   echo "${BOO_ROOT_PATH}/${local_path}"
 }
-
-function parse_key_parameters {
-  while [[ $# -gt 1 ]]
-  do
-    key="$1"
-
-    case $key in
-        -p|--port)
-          PORT="$2"
-          shift # past argument
-          ;;
-        *)
-          # unknown option
-        ;;
-    esac
-      shift # past argument or value
-  done
-}
