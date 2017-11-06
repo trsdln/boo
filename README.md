@@ -36,10 +36,7 @@ MONGO_USER="db_user"
 MONGO_PASSWORD="db_user_password"
 MONGO_HOST="mongo.db.host.com:3001"
 MONGO_DB="mongo_db_name"
-MONGO_URL="mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}"
-
-# or if you need to specify replicaSet:
-# MONGO_URL="mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?replicaSet=set-example"
+MONGO_CUSTOM_FLAGS="--ssl --sslAllowInvalidCertificates"
 
 DEPLOY_HOSTNAME="us-east-1.galaxy-deploy.meteor.com"
 DOMAIN_NAME='app.company.com'

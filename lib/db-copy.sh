@@ -73,7 +73,7 @@ function db-copy {
     # refresh dump
     rm -rf "${DUMP_ROOT_FOLDER}/${MONGO_DB}"
     echo "Making remote database dump. Please, wait..."
-    mongodump -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" \
+    mongodump ${MONGO_CUSTOM_FLAGS} -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" \
       -o "${DUMP_ROOT_FOLDER}" &> ${output_stream}
   fi
 
