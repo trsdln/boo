@@ -27,7 +27,6 @@ boo build server_name [-v|--verbose] [-c|--cleanup]
 
 Options:
 -v|--verbose  - enable verbose mode (print all logs)
--c|--cleanup  - cleanup .meteor/local directory
 EOF
 }
 
@@ -107,13 +106,15 @@ function post_build_ios {
   local mobile_app_name=$(extract_mobile_config_value 'name')
   local ios_project_path="${BUILD_FOLDER}/ios/project"
 
-  local ios_project_files="${ios_project_path}/${mobile_app_name}"
-  sync_missing_assets ./resources/ios-missing-icons "${ios_project_files}/Images.xcassets/AppIcon.appiconset"
-  sync_missing_assets ./resources/ios-missing-splash "${ios_project_files}/Images.xcassets/LaunchImage.launchimage"
+  if [[ -d "${ios_project_path}" ]]; then
+    local ios_project_files="${ios_project_path}/${mobile_app_name}"
+    sync_missing_assets ./resources/ios-missing-icons "${ios_project_files}/Images.xcassets/AppIcon.appiconset"
+    sync_missing_assets ./resources/ios-missing-splash "${ios_project_files}/Images.xcassets/LaunchImage.launchimage"
 
-  # open generated project inside Xcode
-  echo_success "Opening app at Xcode"
-  open -a Xcode "${ios_project_path}/${mobile_app_name}.xcworkspace"
+    # open generated project inside Xcode
+    echo_success "Opening app at Xcode"
+    open -a Xcode "${ios_project_path}/${mobile_app_name}.xcworkspace"
+  fi
 }
 
 function build {
@@ -123,7 +124,6 @@ function build {
   # additional configuration
   source_config_file 'build.conf'
 
-  local cleanup=""
   local build_verbose_flag=""
 
   # parse rest of function arguments
@@ -134,9 +134,6 @@ function build {
       -v|--verbose)
       OUTPUT_STREAM=/dev/stdout
       build_verbose_flag="--verbose"
-      ;;
-      -c|--clean)
-      cleanup="YES"
       ;;
       *)
       echo_error "Unknown option ${key}"
@@ -153,12 +150,6 @@ function build {
   if [[ -d ${BUILD_FOLDER} ]]; then
     echo "Remove old build in ${BUILD_FOLDER}"
     rm -rf ${BUILD_FOLDER}
-  fi
-
-  # we cannot cleanup .meter/local each time because of https://github.com/meteor/meteor/issues/6756
-  if [[ ${cleanup} == 'YES' ]]; then
-    . $(prepend_with_boo_root 'lib/clean.sh')
-    clean
   fi
 
   # build project for production
