@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-echo "source: ${BASH_SOURCE}"
-echo "pwd: $(pwd)"
 
 function get_boo_root_path {
   local boo_script_location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
