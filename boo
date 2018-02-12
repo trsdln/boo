@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+echo "source: ${BASH_SOURCE}"
+echo "pwd: $(pwd)"
 
 function get_boo_root_path {
   local boo_script_location="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -9,7 +11,14 @@ function get_boo_root_path {
     boo_root_path=${boo_script_location}
   else
     # installed as npm package
-    boo_root_path="$(npm config get prefix)/lib/node_modules/boo"
+    local npm_root="$(npm config get prefix)/lib/node_modules/boo"
+    local yarn_root="$(yarn global dir)/node_modules/boo"
+    
+    if [ -f "${npm_root}" ]; then
+      boo_root_path="${npm_root}"
+    else
+      boo_root_path="${yarn_root}"
+    fi
   fi
 
   echo ${boo_root_path}
