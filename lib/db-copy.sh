@@ -86,10 +86,10 @@ function db-copy {
   fi
 
   # find out if current release supports MongoDB's WiredTiger storage engine
-  local storage_engine_option="mmapv1"
-  if grep -q "METEOR@1.4" ./.meteor/release; then
-    echo_success "Using WiredTiger storage engine"
-    storage_engine_option="wiredTiger"
+  local storage_engine_option="wiredTiger"
+  if grep -q "METEOR@1.3" ./.meteor/release; then
+    echo_success "Fall back to MMAPV1 storage engine"
+    storage_engine_option="mmapv1"
   fi
 
   echo "Starting local database ..."
