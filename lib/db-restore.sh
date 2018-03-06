@@ -87,7 +87,15 @@ function db-restore {
 
     echo "Restoring database from dump..."
 
-    local restore_command="mongorestore ${MONGO_CUSTOM_FLAGS} ${drop_flag} --host=${MONGO_HOST%%,*} \
+    local mongo_host=""
+
+    if [ -z ${MONGO_REPLICA_SET_NAME+x} ]; then
+      mongo_host="${MONGO_HOST}"
+    else
+      mongo_host="${MONGO_REPLICA_SET_NAME}/${MONGO_HOST}"
+    fi
+
+    local restore_command="mongorestore ${MONGO_CUSTOM_FLAGS} ${drop_flag} --host=${mongo_host} \
 --db=${MONGO_DB} --noIndexRestore --username=${MONGO_USER} --password=${MONGO_PASSWORD} \
 ${DUMP_ROOT_DIR}/${FROM_DB_NAME}"
 
