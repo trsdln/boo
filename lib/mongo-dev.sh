@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
+require_meteor_root_dir 
+
 function mongo-dev_help {
     cat << EOF
 Start mongodb with db path .meteor/local/db and connect via mongo

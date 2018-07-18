@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
+
 function backup_help {
   cat << EOF
 Backups already cached database dump from '.dump' directory

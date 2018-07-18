@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-NO_METEOR_ROOT=1
-
 function extract_package_json_value {
   local valueKey=$1
   local value=$(cat ${BOO_ROOT_PATH}/package.json | grep "\"${valueKey}\":" | tail -n 1)

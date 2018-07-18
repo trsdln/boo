@@ -1,5 +1,7 @@
 #!/bin/bash
 
+require_app_root_dir 
+
 DUMP_ROOT_FOLDER="./.dump"
 DB_WAIT_TIME=10
 

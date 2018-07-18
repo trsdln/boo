@@ -45,8 +45,6 @@ function execute_action {
 
   source_action ${boo_root} ${action_name}
 
-  [[ -z ${NO_METEOR_ROOT+x} ]] && ensure_meteor_root_dir
-
   if [[ "$(type -t ${action_name})" == 'function' ]]; then
     ${action_name} ${action_args} # execute action
   else

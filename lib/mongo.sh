@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
+
 function mongo_help {
   cat << EOF
 Open MongoDB shell to remote server

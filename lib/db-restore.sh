@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
 
 FROM_HOST="localhost:27017"
 FROM_DB_NAME="meteor"

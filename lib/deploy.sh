@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
+require_meteor_root_dir 
+
 function deploy_help {
   cat << EOF
 Deploys application to specified server

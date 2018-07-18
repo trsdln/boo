@@ -73,10 +73,17 @@ function source_deploy_conf {
   source_config_file ${config_file}
 }
 
+function require_meteor_root_dir {
+  # ensure we are at Meteor's root dir
+  if [ ! -d .meteor ]; then
+    echo_error "Error: '$(pwd)' is not a Meteor's project root directory ('.meteor' is missing)!"
+    exit 1
+  fi
+}
 
-function ensure_meteor_root_dir {
-  # ensure we are at Meteor's project root
-  if [ ! -d ../config ] || [ ! -d .meteor ]; then
+function require_app_root_dir {
+  # ensure we are at project's root dir
+  if [ ! -d ../config ]; then
     echo_error "Error: '$(pwd)' is not a project's root directory or '../config' folder is missing!"
     exit 1
   fi

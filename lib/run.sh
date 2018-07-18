@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
+require_meteor_root_dir 
+
 function run_help {
   cat << EOF
 Starts Meteor app with specified set of settings

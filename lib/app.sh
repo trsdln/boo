@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+require_app_root_dir 
+
 function app_help {
     cat << EOF
 Execute boo action for other app
