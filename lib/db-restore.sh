@@ -45,7 +45,7 @@ function db-restore {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  local app_local_db_path="$(pwd)/.meteor/local/db"
+  local app_local_db_path="$(pwd)/${BOO_LOCAL_DB_PATH}"
   local drop_flag='--drop'
   local output_stream=/dev/null
 

@@ -28,7 +28,7 @@ function db-copy {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  local local_db_path=$(pwd)/.meteor/local/db
+  local local_db_path=$(pwd)/${BOO_LOCAL_DB_PATH}
 
   local output_stream=/dev/null
   local drop_flag="--drop"
@@ -68,8 +68,8 @@ function db-copy {
 
   # remove old database instead of `meteor reset`
   echo "Removing local database..."
-  rm -rf .meteor/local/db
-  mkdir -p .meteor/local/db ${DUMP_ROOT_FOLDER}
+  rm -rf ${BOO_LOCAL_DB_PATH}
+  mkdir -p ${BOO_LOCAL_DB_PATH} ${DUMP_ROOT_FOLDER}
 
   if [[ ${use_dump} != 1 ]]; then
     # refresh dump

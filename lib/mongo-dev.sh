@@ -14,7 +14,7 @@ EOF
 function mongo-dev {
   local app_name=$(cd .. && basename $(pwd))
   printf "Starting development database for '${COLOR_SUCCESS}${app_name}${COLOR_DEFAULT}'...\n"
-  mongod --dbpath=.meteor/local/db > /dev/null &
+  mongod --dbpath=${BOO_LOCAL_DB_PATH} > /dev/null &
   local mongod_pid=$!
   sleep 5
   mongo meteor
