@@ -2,4 +2,5 @@
 
 # Installs Boo package globally
 
-npm install --global .
+# npm install --global .
+yarn global add $(pwd)
