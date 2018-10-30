@@ -1,17 +1,17 @@
-# Meteor Deployment Toolkit
+# MongoDB Scripts Toolkit
 
 Features: 
 
-* Multiple deployment environment support
 * Multiple configurations support
+* Multiple deployment environment support
 * Additional useful actions that work at context of specific server
 * Custom actions support
 
 Super useful for lazy people: configured once - use any time.
 
-Should be executed from meteor project's root directory (where `.meteor` is located).
+Some commands should be executed from Meteor project's root directory (where `.meteor` is located).
 
-Looks for configurations at `../config/<configuration-name>`
+Looks for configurations at `../config/<configuration-name>` or where `BOO_CONFIG_ROOT` from `.boorc` points to.
 
 ## Configuration example
 
@@ -52,8 +52,17 @@ OWNER_ID="glaxy_organization_name"
 boo <action> [configuration-name] [addtional_keys]
 ```
 
+## Features
 
-## boo deploy
+* `boo db-copy <configuration-name>` copy server's database to `BOO_LOCAL_DB_PATH`;
+* `boo db-restore <configuration-name>` restore database at `BOO_LOCAL_DB_PATH` to remote server;
+* `boo mongo <configuration-name>` open Mongo shell by server name;
+* `boo build <configuration-name>` builds Meteor's Web, iOS (opens in Xcode) and Android (signs and optionally installs on device) apps;
+* `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
+* `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database);
+* `boo help <action-name>` prints short help about specified action.
+
+## boo deploy (Legacy)
 
 Usage:
 
@@ -67,16 +76,6 @@ Supports:
 * AWS (requires Mupx)
 * Galaxy
 
-## Additional useful features
-
-* `boo build <configuration-name>` builds Meteor's Web, iOS (opens in Xcode) and Android (signs and optionally installs on device) apps;
-* `boo mongo <configuration-name>` open Mongo shell by server name;
-* `boo db-copy <configuration-name>` copy server's database to `.meteor/local/db`;
-* `boo db-restore <configuration-name>` restore database at `.meteor/local/db` to remote server;
-* `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
-* `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database);
-* `boo help <action-name>` prints short help about specified action.
-
 ## Custom actions
 
 You can define your own actions as bash functions at `./conf/boo-actions.conf`.
@@ -84,7 +83,6 @@ You can define your own actions as bash functions at `./conf/boo-actions.conf`.
 #### Tested on:
 
 * Mac OS X
-
  
 ## Future work
 

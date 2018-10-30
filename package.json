@@ -1,7 +1,7 @@
 {
   "name": "boo",
   "version": "1.4.0",
-  "description": "Meteor Deployment Toolkit",
+  "description": "MongoDB Scripts Toolkit",
   "main": "boo.sh",
   "bin": {
     "boo": "./boo"
