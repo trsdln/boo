@@ -47,7 +47,7 @@ trap 'on_error ${LINENO}' ERR
 
 
 function source_config_file {
-  local config_file=../config/$1
+  local config_file=${BOO_CONFIG_ROOT}/$1
   local silent=$2
 
   if [ -f ${config_file} ]; then
@@ -84,7 +84,7 @@ function require_meteor_root_dir {
 function require_app_root_dir {
   # ensure we are at project's root dir
   if [ ! -d ../config ]; then
-    echo_error "Error: '$(pwd)' is not a project's root directory or '../config' folder is missing!"
+    echo_error "Error: '$(pwd)' is not a project's root directory or '${BOO_CONFIG_ROOT}' folder is missing!"
     exit 1
   fi
 }
@@ -92,4 +92,14 @@ function require_app_root_dir {
 function prepend_with_boo_root {
   local local_path=$1
   echo "${BOO_ROOT_PATH}/${local_path}"
+}
+
+function source_boorc {
+  local boo_rc_file="./.boorc"
+  if [[ -f "${boo_rc_file}" ]]; then
+    . ${boo_rc_file}
+  else
+    BOO_LOCAL_DB_PATH=".meteor/local/db"
+    BOO_CONFIG_ROOT="../config"
+  fi
 }

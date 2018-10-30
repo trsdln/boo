@@ -59,6 +59,9 @@ BOO_ROOT_PATH=$(get_boo_root_path)
 # source common functions
 . ${BOO_ROOT_PATH}/common.sh
 
+# source configuration if available
+source_boorc
+
 # split action name and action arguments
 ACTION_NAME=$1
 ALL_ARGS="$@"

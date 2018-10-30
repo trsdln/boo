@@ -65,7 +65,7 @@ function post_build_android {
   fi
 
   # sign APK
-  jarsigner -keystore ../../config/keystore.jks \
+  jarsigner -keystore ../${BOO_CONFIG_ROOT}/keystore.jks \
      -storepass "${KEYSTORE_PASSWORD}" -keypass "${PRIVATE_KEY_PASSWORD}" \
      -verbose -sigalg SHA1withRSA -digestalg SHA1 \
      ${unsigned_apk_name} ${APP_NAME} > ${OUTPUT_STREAM}
@@ -156,7 +156,7 @@ function build {
 
   # build project for production
   meteor build ${BUILD_FOLDER} ${build_verbose_flag} \
-         --mobile-settings=../config/${server_name}/settings.json --server ${ROOT_URL}
+         --mobile-settings=${BOO_CONFIG_ROOT}/${server_name}/settings.json --server ${ROOT_URL}
 
   # iOS
   post_build_ios

@@ -40,7 +40,7 @@ function run {
   source_deploy_conf ${server_name}
 
   local run_mode=$2
-  local settings_path="../config/${server_name}/settings.json"
+  local settings_path="${BOO_CONFIG_ROOT}/${server_name}/settings.json"
 
   PORT="3000"
 

@@ -105,7 +105,7 @@ function db-copy {
     ${drop_flag} "${dump_folder}" &> ${output_stream}
 
   if [[ ${run_post_hook} == 1 ]]; then
-    local post_hook_file=../config/${server_name}/post-dump.js
+    local post_hook_file=${BOO_CONFIG_ROOT}/${server_name}/post-dump.js
 
     if [[ -f ${post_hook_file} ]]; then
       echo "Executing post dump hook script ..."

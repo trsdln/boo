@@ -37,7 +37,7 @@ function deploy_to_heroku {
   heroku config:add MONGO_URL="${MONGO_URL}" -r ${server_name}
 
   # set Meteor settings
-  heroku config:add METEOR_SETTINGS="$(cat ../config/${server_name}/settings.json)" -r ${server_name}
+  heroku config:add METEOR_SETTINGS="$(cat ${BOO_CONFIG_ROOT}/${server_name}/settings.json)" -r ${server_name}
 
   git push -f ${server_name} ${branch_name}:master
 }
@@ -47,7 +47,7 @@ function deploy_to_aws {
   print_server_type 'AWS'
   local server_name=$1
 
-  cd ../config/${server_name}
+  cd ${BOO_CONFIG_ROOT}/${server_name}
 
   # prevent building of mobile platforms
   local platforms_file=../../app/.meteor/platforms
@@ -76,7 +76,7 @@ function deploy_to_galaxy {
   print_server_type 'Galaxy'
   # todo: add build in env variables to settings.json support
   export DEPLOY_HOSTNAME
-  meteor deploy ${DOMAIN_NAME} --owner ${OWNER_ID} --settings ../config/${server_name}/settings.json
+  meteor deploy ${DOMAIN_NAME} --owner ${OWNER_ID} --settings ${BOO_CONFIG_ROOT}/${server_name}/settings.json
 }
 
 
