@@ -83,7 +83,7 @@ function require_meteor_root_dir {
 
 function require_app_root_dir {
   # ensure we are at project's root dir
-  if [ ! -d ../config ]; then
+  if [ ! -d "${BOO_CONFIG_ROOT}" ]; then
     echo_error "Error: '$(pwd)' is not a project's root directory or '${BOO_CONFIG_ROOT}' folder is missing!"
     exit 1
   fi
