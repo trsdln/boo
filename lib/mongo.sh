@@ -12,11 +12,13 @@ EOF
 
 function mongo {
   local server_name=$1
+  local mongo_command_args="${@:2}"
+
   source_deploy_conf ${server_name}
 
   echo "Connecting to database of ${server_name}..."
 
   # "which" prevents self invocation
   $(which mongo) "mongodb://${MONGO_HOST}/${MONGO_DB}${MONGO_URL_QUERY}" \
-      ${MONGO_CUSTOM_FLAGS} -u ${MONGO_USER} -p ${MONGO_PASSWORD}
+      ${MONGO_CUSTOM_FLAGS} -u ${MONGO_USER} -p ${MONGO_PASSWORD} ${mongo_command_args}
 }
