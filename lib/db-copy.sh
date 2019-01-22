@@ -75,7 +75,11 @@ function db-copy {
     # refresh dump
     rm -rf "${DUMP_ROOT_FOLDER}/${MONGO_DB}"
     echo "Making remote database dump. Please, wait..."
-    mongodump ${MONGO_CUSTOM_FLAGS} -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" \
+
+    # Force table scan fixes incompatibility problem between 4.x and 3.x
+    # https://dba.stackexchange.com/a/226541
+    mongodump ${MONGO_CUSTOM_FLAGS} --forceTableScan \
+      -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" \
       -o "${DUMP_ROOT_FOLDER}" &> ${output_stream}
   fi
 
@@ -89,10 +93,6 @@ function db-copy {
 
   # find out if current release supports MongoDB's WiredTiger storage engine
   local storage_engine_option="wiredTiger"
-  if grep -q "METEOR@1.3" ./.meteor/release; then
-    echo_success "Fall back to MMAPV1 storage engine"
-    storage_engine_option="mmapv1"
-  fi
 
   echo "Starting local database ..."
   mongod --dbpath="${local_db_path}" --port="${LOCAL_DB_PORT}" --storageEngine=${storage_engine_option} \
