@@ -1,6 +1,6 @@
 #!/bin/bash
 
-require_app_root_dir 
+require_app_root_dir
 
 DUMP_ROOT_FOLDER="./.dump"
 DB_WAIT_TIME=10
@@ -115,6 +115,10 @@ function db-copy {
   fi
 
   kill ${mongod_pid}
+
+  # wait until mongod stops so it doesn't conflict
+  # with next command at pipeline
+  sleep 5
 
   echo_success "Database is successfully copied!"
 }
