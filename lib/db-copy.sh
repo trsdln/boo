@@ -100,7 +100,10 @@ function db-copy {
   local mongod_pid=$!
   sleep ${DB_WAIT_TIME}
 
-  mongorestore --uri "${LOCAL_MONGO_URL}" \
+  # probably bug at mongorestore requires specify --db separately
+  mongorestore \
+    --uri "${LOCAL_MONGO_URL}" \
+    --db "$(get_db_name_by_mongo_url ${LOCAL_MONGO_URL})" \
     ${drop_flag} "${dump_folder}" &> ${output_stream}
 
   if [[ ${run_post_hook} == 1 ]]; then

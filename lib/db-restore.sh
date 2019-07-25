@@ -86,8 +86,10 @@ function db-restore {
 
     echo "Restoring database from dump..."
 
+    # probably bug at mongorestore requires specify --db separately
     mongorestore "${drop_flag}" \
       --uri "${MONGO_URL}" \
+      --db "$(get_db_name_by_mongo_url ${MONGO_URL})" \
       --noIndexRestore "${DUMP_ROOT_DIR}/$(get_db_name_by_mongo_url ${LOCAL_MONGO_URL})"
 
     echo_success "Done! Local database restored to ${SERVER_DESCRIPTION}."
