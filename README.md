@@ -32,11 +32,7 @@ SERVER_DESCRIPTION="Production server"
 SERVER_TYPE="galaxy"
 VERIFY_TIMEOUT=20
 
-MONGO_USER="db_user"
-MONGO_PASSWORD="db_user_password"
-MONGO_HOST="mongo.db.host.com:3001"
-MONGO_DB="mongo_db_name"
-MONGO_CUSTOM_FLAGS="--ssl --sslAllowInvalidCertificates"
+MONGO_URL="mongodb://user:pass@localhost:27017/meteor"
 
 DEPLOY_HOSTNAME="us-east-1.galaxy-deploy.meteor.com"
 DOMAIN_NAME='app.company.com'

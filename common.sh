@@ -103,3 +103,9 @@ function source_boorc {
     BOO_CONFIG_ROOT="../config"
   fi
 }
+
+function get_db_name_by_mongo_url {
+  local url=$1
+  # naive implementation (doesn't handle ?arg=val cases)
+  echo "${url##*/}"
+}

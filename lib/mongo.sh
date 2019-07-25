@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-require_app_root_dir 
+require_app_root_dir
 
 function mongo_help {
   cat << EOF
@@ -19,6 +19,5 @@ function mongo {
   echo "Connecting to database of ${server_name}..."
 
   # "which" prevents self invocation
-  $(which mongo) "mongodb://${MONGO_HOST}/${MONGO_DB}${MONGO_URL_QUERY}" \
-      ${MONGO_CUSTOM_FLAGS} -u ${MONGO_USER} -p ${MONGO_PASSWORD} ${mongo_command_args}
+  $(which mongo) "${MONGO_URL}" ${mongo_command_args}
 }

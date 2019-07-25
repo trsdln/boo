@@ -2,12 +2,9 @@
 
 require_app_root_dir
 
+LOCAL_MONGO_URL="mongodb://localhost:27017/meteor"
 DUMP_ROOT_FOLDER="./.dump"
 DB_WAIT_TIME=10
-
-LOCAL_DB_PORT=3000
-LOCAL_DB_HOST=127.0.0.1
-LOCAL_DB_NAME=meteor
 
 function db-copy_help {
   cat << EOF
@@ -22,7 +19,6 @@ Options:
 --no-drop  - prevent database drop before restore
 EOF
 }
-
 
 function db-copy {
   local server_name=$1
@@ -71,19 +67,20 @@ function db-copy {
   rm -rf ${BOO_LOCAL_DB_PATH}
   mkdir -p ${BOO_LOCAL_DB_PATH} ${DUMP_ROOT_FOLDER}
 
+  local dump_folder="${DUMP_ROOT_FOLDER}/$(get_db_name_by_mongo_url ${MONGO_URL})"
+
   if [[ ${use_dump} != 1 ]]; then
     # refresh dump
-    rm -rf "${DUMP_ROOT_FOLDER}/${MONGO_DB}"
+    rm -rf "${dump_folder}"
     echo "Making remote database dump. Please, wait..."
 
     # Force table scan fixes incompatibility problem between 4.x and 3.x
     # https://dba.stackexchange.com/a/226541
-    mongodump ${MONGO_CUSTOM_FLAGS} --forceTableScan \
-      -u "${MONGO_USER}" -h "${MONGO_HOST}" -d "${MONGO_DB}" -p "${MONGO_PASSWORD}" \
-      -o "${DUMP_ROOT_FOLDER}" &> ${output_stream}
+    mongodump \
+      --forceTableScan \
+      --uri "${MONGO_URL}" \
+      --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
   fi
-
-  local dump_folder="${DUMP_ROOT_FOLDER}/${MONGO_DB}"
 
   # check if dump exists
   if [[ ! -d ${dump_folder} ]]; then
@@ -95,13 +92,15 @@ function db-copy {
   local storage_engine_option="wiredTiger"
 
   echo "Starting local database ..."
-  mongod --dbpath="${local_db_path}" --port="${LOCAL_DB_PORT}" --storageEngine=${storage_engine_option} \
+  mongod \
+    --dbpath="${local_db_path}" \
+    --storageEngine=${storage_engine_option} \
     --nojournal > ${output_stream} &
 
   local mongod_pid=$!
   sleep ${DB_WAIT_TIME}
 
-  mongorestore --host=${LOCAL_DB_HOST} --port=${LOCAL_DB_PORT} --db=${LOCAL_DB_NAME} \
+  mongorestore --uri "${LOCAL_MONGO_URL}" \
     ${drop_flag} "${dump_folder}" &> ${output_stream}
 
   if [[ ${run_post_hook} == 1 ]]; then
@@ -109,7 +108,7 @@ function db-copy {
 
     if [[ -f ${post_hook_file} ]]; then
       echo "Executing post dump hook script ..."
-      mongo  --host=${LOCAL_DB_HOST} --port=${LOCAL_DB_PORT} \
+      mongo  "${LOCAL_MONGO_URL}" \
         --eval "$(cat ${post_hook_file})" > ${output_stream}
     fi
   fi

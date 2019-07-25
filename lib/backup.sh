@@ -18,10 +18,12 @@ function backup {
   # additional configuration
   source_config_file 'backup.conf'
 
-  local dump_folder="./.dump/${MONGO_DB}"
+  local db_name=$(get_db_name_by_mongo_url ${MONGO_URL})
+
+  local dump_folder="./.dump/${db_name}"
 
   local date_str=`date +%Y-%m-%d`
-  local backup_file_name="${MONGO_DB}-${date_str}.zip"
+  local backup_file_name="${db_name}-${date_str}.zip"
 
   echo "Making backup ${backup_file_name}..."
   zip -r ${backup_file_name}  ${dump_folder}

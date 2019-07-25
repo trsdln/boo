@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-require_app_root_dir 
+require_app_root_dir
 
-FROM_HOST="localhost:27017"
-FROM_DB_NAME="meteor"
+LOCAL_MONGO_URL="mongodb://localhost:27017/meteor"
 DUMP_ROOT_DIR="./.dump"
 
 function print_restore_status {
@@ -20,7 +19,6 @@ ${COLOR_ERROR}${TEXT_BOLD}
 ${COLOR_DEFAULT}
 Server: ${SERVER_DESCRIPTION}
 URL: ${TEXT_UNDERLINE}${ROOT_URL}${COLOR_DEFAULT}
-Mongo: ${MONGO_HOST}
 Drop enabled: ${TEXT_BOLD}${COLOR_ERROR}${drop_enabled}${COLOR_DEFAULT}
 
 Are you sure? (Enter 'yes' to continue):
@@ -82,26 +80,16 @@ function db-restore {
     sleep 20
 
     echo "Making local database dump..."
-    mongodump -h "${FROM_HOST}" -d "${FROM_DB_NAME}" -o "${DUMP_ROOT_DIR}" &> ${output_stream}
+    mongodump --uri "${LOCAL_MONGO_URL}" --out "${DUMP_ROOT_DIR}" &> ${output_stream}
 
     kill ${mongod_pid}
 
     echo "Restoring database from dump..."
 
-    local mongo_host=""
+    mongorestore "${drop_flag}" \
+      --uri "${MONGO_URL}" \
+      --noIndexRestore "${DUMP_ROOT_DIR}/$(get_db_name_by_mongo_url ${LOCAL_MONGO_URL})"
 
-    if [ -z ${MONGO_REPLICA_SET_NAME+x} ]; then
-      mongo_host="${MONGO_HOST}"
-    else
-      mongo_host="${MONGO_REPLICA_SET_NAME}/${MONGO_HOST}"
-    fi
-
-    local restore_command="mongorestore ${MONGO_CUSTOM_FLAGS} ${drop_flag} --host=${mongo_host} \
---db=${MONGO_DB} --noIndexRestore --username=${MONGO_USER} --password=${MONGO_PASSWORD} \
-${DUMP_ROOT_DIR}/${FROM_DB_NAME}"
-
-    eval ${restore_command}
-
-    echo_success "Done! Local database restored to ${SERVER_DESCRIPTION} [${MONGO_HOST}]."
+    echo_success "Done! Local database restored to ${SERVER_DESCRIPTION}."
   fi
 }
