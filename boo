@@ -9,9 +9,9 @@ function get_boo_root_path {
     boo_root_path=${boo_script_location}
   else
     # installed as npm package
-    local npm_root="$(npm config get prefix)/lib/node_modules/boo"
-    local yarn_root="$(yarn global dir)/node_modules/boo"
-    
+    local npm_root="$(which npm &> /dev/null && npm config get prefix)/lib/node_modules/boo"
+    local yarn_root="$(which yarn &> /dev/null && yarn global dir)/node_modules/boo"
+
     if [ -d "${npm_root}" ]; then
       boo_root_path="${npm_root}"
     else
