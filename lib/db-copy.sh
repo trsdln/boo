@@ -78,6 +78,7 @@ function db-copy {
     # https://dba.stackexchange.com/a/226541
     mongodump \
       --forceTableScan \
+      ${CUSTOM_MONGODUMP_FLAGS} \
       --uri "${MONGO_URL}" \
       --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
   fi
