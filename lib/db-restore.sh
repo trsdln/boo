@@ -2,7 +2,6 @@
 
 require_app_root_dir
 
-LOCAL_MONGO_URL="mongodb://localhost:27017/meteor"
 DUMP_ROOT_DIR="./.dump"
 
 function print_restore_status {
@@ -17,7 +16,7 @@ ${COLOR_ERROR}${TEXT_BOLD}
 # You may lost data at remote server #
 ######################################
 ${COLOR_DEFAULT}
-Server: ${SERVER_DESCRIPTION}
+Server: ${SERVER_FROM_DESCRIPTION} -> ${SERVER_DESCRIPTION}
 URL: ${TEXT_UNDERLINE}${ROOT_URL}${COLOR_DEFAULT}
 Drop enabled: ${TEXT_BOLD}${COLOR_ERROR}${drop_enabled}${COLOR_DEFAULT}
 
@@ -31,7 +30,7 @@ function db-restore_help {
   cat << EOF
 This script enables restoring of database from local project directory to remote server
 
-boo db-restore server_name [--no-drop|-D] [-v|--verbose]
+boo db-restore server_name_from server_name_to [--no-drop|-D] [-v|--verbose]
 
 Options:
 --no-drop|-D  - prevent all collections drop before dump restore
@@ -40,12 +39,15 @@ EOF
 }
 
 function db-restore {
-  local server_name=$1
-  source_deploy_conf ${server_name}
+  local server_name_from=$1
+  local server_name_to=$2
 
-  local app_local_db_path="$(pwd)/${BOO_LOCAL_DB_PATH}"
+
   local drop_flag='--drop'
+  local skip_confirmation="no"
   local output_stream=/dev/null
+
+  shift # skip server_name_to
 
   # parse script arguments
   while [[ $(($#-1)) -gt 0 ]]; do
@@ -53,45 +55,52 @@ function db-restore {
 
     case ${key} in
       --no-drop|-D)
-      drop_flag=''
-      ;;
+        drop_flag=''
+        ;;
       -v|--verbose)
-      output_stream=/dev/stdout
-      ;;
+        output_stream=/dev/stdout
+        ;;
+      -Y|--yes-im-sure)
+        skip_confirmation="yes"
+        ;;
       *)
-      echo_error "Unknown option: ${key}"
-      exit 1
-      ;;
+        echo_error "Unknown option: ${key}"
+        exit 1
+        ;;
     esac
 
     shift # past argument or value
   done
 
-  # first get confirmation... just in case :)
-  print_restore_status ${drop_flag}
+  # collect configs data
 
-  read CONFIRM
+  source_deploy_conf ${server_name_from}
 
-  if [[ ${CONFIRM} =~ ^yes$ ]]; then
-    echo "Starting local database server... "
-    mongod --dbpath "${app_local_db_path}" > ${output_stream} &
+  SERVER_FROM_DESCRIPTION=${SERVER_DESCRIPTION}
+  local server_from_db_name=$(get_db_name_by_mongo_url ${MONGO_URL})
 
-    local mongod_pid=$!
-    sleep 20
+  source_deploy_conf ${server_name_to}
 
-    echo "Making local database dump..."
-    mongodump --uri "${LOCAL_MONGO_URL}" --out "${DUMP_ROOT_DIR}" &> ${output_stream}
+  # confirmation
 
-    kill ${mongod_pid}
+  if [ "${skip_confirmation}" != "yes" ]; then
+    # first get confirmation... just in case :)
+    print_restore_status ${drop_flag}
 
-    echo "Restoring database from dump..."
+    read CONFIRM
 
-    # probably bug at mongorestore requires specify --db separately
-    mongorestore "${drop_flag}" \
-      --uri "${MONGO_URL}" \
-      --db "$(get_db_name_by_mongo_url ${MONGO_URL})" \
-      --noIndexRestore "${DUMP_ROOT_DIR}/$(get_db_name_by_mongo_url ${LOCAL_MONGO_URL})"
-
-    echo_success "Done! Local database restored to ${SERVER_DESCRIPTION}."
+    if [ "${CONFIRM}" != "yes" ]; then
+      exit 1
+    fi
   fi
+
+  echo "Restoring database from dump..."
+
+  # probably bug at mongorestore requires specify --db separately
+  mongorestore "${drop_flag}" \
+    --uri "${MONGO_URL}" \
+    --db "$(get_db_name_by_mongo_url ${MONGO_URL})" \
+    --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
+
+  echo_success "Done! Local database restored to ${SERVER_DESCRIPTION}."
 }

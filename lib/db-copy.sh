@@ -4,19 +4,15 @@ require_app_root_dir
 
 LOCAL_MONGO_URL="mongodb://localhost:27017/meteor"
 DUMP_ROOT_FOLDER="./.dump"
-DB_WAIT_TIME=10
 
 function db-copy_help {
   cat << EOF
 Copy remote database
 
-boo db-copy server_type [-d|--dump] [-v|--verbose] [--no-drop|-D] [--no-hook|-H]
+boo db-copy server_name [-v|--verbose]
 
 Options:
--d  - use previously created dump
 -v  - verbose mode (print all logs)
---no-hook  - prevent post restore hook execution
---no-drop  - prevent database drop before restore
 EOF
 }
 
@@ -24,11 +20,8 @@ function db-copy {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  local local_db_path=$(pwd)/${BOO_LOCAL_DB_PATH}
-
   local output_stream=/dev/null
   local drop_flag="--drop"
-  local use_dump=0
   local run_post_hook=1
 
   # parse script arguments
@@ -36,25 +29,13 @@ function db-copy {
     local key="$2"
 
     case ${key} in
-      --no-drop|-D)
-      drop_flag=""
-      echo "Prevent database drop: YES"
-      ;;
-      --no-hook|-H)
-      run_post_hook=0
-      echo "Prevent post dump hook: YES"
-      ;;
-      -d|--dump)
-      use_dump=1
-      echo "Use local dump: YES"
-      ;;
       -v|--verbose)
-      output_stream="/dev/stdout"
-      ;;
+        output_stream="/dev/stdout"
+        ;;
       *)
-      echo_error "Unknown option ${key}"
-      exit 1
-      ;;
+        echo_error "Unknown option ${key}"
+        exit 1
+        ;;
     esac
 
     shift # past argument or value
@@ -62,66 +43,19 @@ function db-copy {
 
   printf "Selected database of '${COLOR_SUCCESS}${SERVER_DESCRIPTION}${COLOR_DEFAULT}'\n"
 
-  # remove old database instead of `meteor reset`
-  echo "Removing local database..."
-  rm -rf ${BOO_LOCAL_DB_PATH}
-  mkdir -p ${BOO_LOCAL_DB_PATH} ${DUMP_ROOT_FOLDER}
-
   local dump_folder="${DUMP_ROOT_FOLDER}/$(get_db_name_by_mongo_url ${MONGO_URL})"
 
-  if [[ ${use_dump} != 1 ]]; then
-    # refresh dump
-    rm -rf "${dump_folder}"
-    echo "Making remote database dump. Please, wait..."
+  # refresh dump
+  rm -rf "${dump_folder}"
+  echo "Making remote database dump. Please, wait..."
 
-    # Force table scan fixes incompatibility problem between 4.x and 3.x
-    # https://dba.stackexchange.com/a/226541
-    mongodump \
-      --forceTableScan \
-      ${CUSTOM_MONGODUMP_FLAGS} \
-      --uri "${MONGO_URL}" \
-      --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
-  fi
-
-  # check if dump exists
-  if [[ ! -d ${dump_folder} ]]; then
-    echo_error "Dump '${dump_folder}' doesn't exists!"
-    exit 1
-  fi
-
-  # find out if current release supports MongoDB's WiredTiger storage engine
-  local storage_engine_option="wiredTiger"
-
-  echo "Starting local database ..."
-  mongod \
-    --dbpath="${local_db_path}" \
-    --storageEngine=${storage_engine_option} \
-    --nojournal > ${output_stream} &
-
-  local mongod_pid=$!
-  sleep ${DB_WAIT_TIME}
-
-  # probably bug at mongorestore requires specify --db separately
-  mongorestore \
-    --uri "${LOCAL_MONGO_URL}" \
-    --db "$(get_db_name_by_mongo_url ${LOCAL_MONGO_URL})" \
-    ${drop_flag} "${dump_folder}" &> ${output_stream}
-
-  if [[ ${run_post_hook} == 1 ]]; then
-    local post_hook_file=${BOO_CONFIG_ROOT}/${server_name}/post-dump.js
-
-    if [[ -f ${post_hook_file} ]]; then
-      echo "Executing post dump hook script ..."
-      mongo  "${LOCAL_MONGO_URL}" \
-        --eval "$(cat ${post_hook_file})" > ${output_stream}
-    fi
-  fi
-
-  kill ${mongod_pid}
-
-  # wait until mongod stops so it doesn't conflict
-  # with next command at pipeline
-  sleep 5
+  # Force table scan fixes incompatibility problem between 4.x and 3.x
+  # https://dba.stackexchange.com/a/226541
+  mongodump \
+    --forceTableScan \
+    ${CUSTOM_MONGODUMP_FLAGS} \
+    --uri "${MONGO_URL}" \
+    --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
 
   echo_success "Database is successfully copied!"
 }

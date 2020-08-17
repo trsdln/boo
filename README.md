@@ -1,6 +1,6 @@
 # MongoDB Scripts Toolkit
 
-Features: 
+Features:
 
 * Multiple configurations support
 * Multiple deployment environment support
@@ -50,8 +50,9 @@ boo <action> [configuration-name] [addtional_keys]
 
 ## Features
 
-* `boo db-copy <configuration-name>` copy server's database to `BOO_LOCAL_DB_PATH`;
-* `boo db-restore <configuration-name>` restore database at `BOO_LOCAL_DB_PATH` to remote server;
+* `boo db-copy <config-name>` save specified environment DB dump at
+  `./.dump`;
+* `boo db-restore <config-name-from> <config-name-to>` restore locally stored from DB to specified database at `<config-name-to>`;
 * `boo mongo <configuration-name>` open Mongo shell by server name;
 * `boo build <configuration-name>` builds Meteor's Web, iOS (opens in Xcode) and Android (signs and optionally installs on device) apps;
 * `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
@@ -79,10 +80,15 @@ You can define your own actions as bash functions at `./conf/boo-actions.conf`.
 #### Tested on:
 
 * Mac OS X
- 
-## Future work
 
-- [x] custom scripts
-- [ ] describe deployment configuration for each platform in docs
-- [ ] add configuration examples
-- [ ] describe additional keys for other commands
+## Changelog
+
+#### 3.0.0
+
+- [x] __breaking change__: simplify `db-*` scripts to do single action at a time (gives more
+  flexibility). Old vs. new:
+  * `boo db-copy test` => `boo db-copy test && boo db-restore test
+  local -Y`
+  * `boo db-restore test` => `boo db-copy local && boo db-restore
+  local test -Y`
+- [x] add `--yes-im-sure` flag to `db-restore` script
