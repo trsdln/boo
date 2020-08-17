@@ -15,10 +15,6 @@ function echo_warning {
   printf "${COLOR_WARNING}${1}${COLOR_DEFAULT}\n"
 }
 
-function echo_danger {
-  printf "${TEXT_BOLD}${COLOR_DANGER}${1}${COLOR_DEFAULT}\n"
-}
-
 function echo_error {
   printf "${COLOR_ERROR}${1}${COLOR_DEFAULT}\n"
 }
@@ -26,7 +22,6 @@ function echo_error {
 function test_echo_colors {
   echo_success "success"
   echo_warning "warning"
-  echo_danger "danger"
   echo_error "error"
 }
 

@@ -90,6 +90,18 @@ function db-restore {
     read CONFIRM
 
     if [ "${CONFIRM}" != "yes" ]; then
+      echo_error "Operation aborted!"
+      exit 1
+    fi
+  fi
+
+  # double confirmation for production
+  if [ "${server_name_to}" = "production" ]; then
+    echo_error "    You're trying to restore to **production**. Are you sure? "
+    read CONFIRM
+
+    if [ "${CONFIRM}" != "yes" ]; then
+      echo_error "Operation aborted!"
       exit 1
     fi
   fi
