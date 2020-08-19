@@ -114,5 +114,9 @@ function db-restore {
     --db "$(get_db_name_by_mongo_url ${MONGO_URL})" \
     --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
 
-  echo_success "Done! Local database restored to ${SERVER_DESCRIPTION}."
+  if [ "$?" == "0" ]; then
+    echo_success "'${server_name_from}' database successfully restored to '${SERVER_DESCRIPTION}'!"
+  else
+    echo_error "Failed to restore DB! Use -v flag to get more info."
+  fi
 }

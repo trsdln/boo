@@ -57,5 +57,10 @@ function db-copy {
     --uri "${MONGO_URL}" \
     --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
 
-  echo_success "Database is successfully copied!"
+  if [ "$?" == "0" ]; then
+    echo_success "'${server_name}' database is successfully copied!"
+  else
+    echo_error "Failed to copy '${server_name}' DB! Use -v flag to get more info."
+  fi
+
 }
