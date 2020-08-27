@@ -43,6 +43,19 @@ trap 'on_error ${LINENO}' ERR
 
 function source_config_file {
   local config_file=${BOO_CONFIG_ROOT}/$1
+
+  if [ ! -f "${config_file}" ]; then
+    # try to find custom server root path sourced from .boorc
+    local server_name="${1%%/*}"
+    if [ "$server_name" != "${1}" ]; then
+      local server_root_env_name="boo_${server_name}_config_root"
+      local alt_config_file="${!server_root_env_name}/${1#*/}"
+      if [ -f "${alt_config_file}" ]; then
+        local config_file="${alt_config_file}"
+      fi
+    fi
+  fi
+
   local silent=$2
 
   if [ -f ${config_file} ]; then
@@ -82,11 +95,6 @@ function require_app_root_dir {
     echo_error "Error: '$(pwd)' is not a project's root directory or '${BOO_CONFIG_ROOT}' folder is missing!"
     exit 1
   fi
-}
-
-function prepend_with_boo_root {
-  local local_path=$1
-  echo "${BOO_ROOT_PATH}/${local_path}"
 }
 
 function source_boorc {
