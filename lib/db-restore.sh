@@ -106,13 +106,19 @@ function db-restore {
     fi
   fi
 
+  if [ "${drop_flag}" != '' ]; then
+    echo_warning "Dropping old DB..."
+    # otherwise old DB's collections will be kept if new dump doesn't contain those
+    mongo --eval="db.dropDatabase()" "${MONGO_URL}" > "${output_stream}"
+  fi
+
   echo "Restoring database from dump..."
 
   # probably bug at mongorestore requires specify --db separately
   mongorestore "${drop_flag}" \
     --uri "${MONGO_URL}" \
     --db "$(get_db_name_by_mongo_url ${MONGO_URL})" \
-    --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
+    --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}" &> "${output_stream}"
 
   if [ "$?" == "0" ]; then
     echo_success "'${server_name_from}' database successfully restored to '${SERVER_DESCRIPTION}'!"
