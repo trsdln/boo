@@ -56,11 +56,12 @@ function db-copy {
     ${CUSTOM_MONGODUMP_FLAGS} \
     --uri "${MONGO_URL}" \
     --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
+  local copy_res=$?
 
-  if [ "$?" == "0" ]; then
+  if [ "$copy_res" == "0" ]; then
     echo_success "'${server_name}' database is successfully copied!"
   else
     echo_error "Failed to copy '${server_name}' DB! Use -v flag to get more info."
+    exit $copy_res
   fi
-
 }
