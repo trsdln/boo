@@ -30,11 +30,12 @@ function db-restore_help {
   cat << EOF
 This script enables restoring of database from local project directory to remote server
 
-boo db-restore server_name_from server_name_to [--no-drop|-D] [-v|--verbose]
+boo db-restore server_name_from server_name_to [--no-drop|-D] [-v|--verbose] [--yes-im-sure|-Y]
 
 Options:
---no-drop|-D  - prevent all collections drop before dump restore
--v|--verbose  - verbose mode (print all logs)
+--no-drop|-D     - prevent all collections drop before dump restore
+-v|--verbose     - verbose mode (print all logs)
+-Y|--yes-im-sure - prevent confirmation
 EOF
 }
 
