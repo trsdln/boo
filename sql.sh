@@ -32,7 +32,7 @@ start_sql_proxy() {
     ensure_sql_proxy_bin_exists
 
     echo "Starting ${POSTGRES_INSTANCE} proxy..."
-    "${sql_proxy_bin}" -instances="${POSTGRES_INSTANCE}=tcp:${POSTGRES_PROXY_PORT}" &> /dev/null &
+    "${sql_proxy_bin}" -verbose=false -instances="${POSTGRES_INSTANCE}=tcp:${POSTGRES_PROXY_PORT}" &
     sql_proxy_pid=$!
 
     echo "Waiting for proxy to start..."
