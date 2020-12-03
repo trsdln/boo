@@ -94,7 +94,13 @@ function sql-restore {
   # drop existing database
   local default_postgres_url="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PROXY_PORT}/postgres"
   echo "drop database ${POSTGRES_DB}; create database ${POSTGRES_DB};" \
-    | psql "${default_postgres_url}"
+    | psql -v ON_ERROR_STOP=1 "${default_postgres_url}"
+
+  local psql_drop_res=$?
+  if [ "$psql_drop_res" != "0" ]; then
+    echo_error "Error: Failed to drop old DB. See logs above for details."
+    exit "$psql_drop_res"
+  fi
 
   echo "Restoring dump..."
   psql "${POSTGRE_PROXY_URL}" < "${dump_file}"
