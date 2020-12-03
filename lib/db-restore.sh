@@ -110,7 +110,8 @@ function db-restore {
   if [ "${drop_flag}" != '' ]; then
     echo_warning "Dropping old DB..."
     # otherwise old DB's collections will be kept if new dump doesn't contain those
-    mongo --eval="db.dropDatabase()" "${MONGO_URL}" > "${output_stream}"
+    mongo --eval="db.getCollectionNames().forEach(coll => db.getCollection(coll).drop())" \
+      "${MONGO_URL}" > "${output_stream}"
   fi
 
   echo "Restoring database from dump..."
