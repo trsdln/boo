@@ -7,7 +7,7 @@ function sql-restore_help {
 Restore PostgreSQL database local copy to specified instance.
 Note: For development use only. Doesn't handle big databases
 
-boo sql-copy server_name_from server_name_to [-Y|--yes-im-sure]
+boo sql-copy server_name_from server_name_to [--yes-im-sure|-Y]
 
 Options:
 -Y|--yes-im-sure - prevent confirmation
@@ -47,8 +47,7 @@ function sql-restore {
         skip_confirmation="yes"
         ;;
       *)
-        echo_error "Unknown option: ${key}"
-        exit 1
+        echo_warning "Unknown option: ${key}"
         ;;
     esac
 

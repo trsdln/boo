@@ -21,7 +21,6 @@ function mongo-copy {
   source_deploy_conf ${server_name}
 
   local output_stream=/dev/null
-  local drop_flag="--drop"
   local run_post_hook=1
 
   # parse script arguments

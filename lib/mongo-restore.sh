@@ -30,10 +30,10 @@ function mongo-restore_help {
   cat << EOF
 This script enables restoring of database from local project directory to remote server
 
-boo mongo-restore server_name_from server_name_to [--no-drop|-D] [-v|--verbose] [--yes-im-sure|-Y]
+boo mongo-restore server_name_from server_name_to [--no-drop|-D] [--verbose|-v] [--yes-im-sure|-Y]
 
 Options:
---no-drop|-D     - prevent all collections drop before dump restore
+-D|--no-drop     - prevent all collections drop before dump restore
 -v|--verbose     - verbose mode (print all logs)
 -Y|--yes-im-sure - prevent confirmation
 EOF
@@ -42,7 +42,6 @@ EOF
 function mongo-restore {
   local server_name_from=$1
   local server_name_to=$2
-
 
   local drop_flag='--drop'
   local skip_confirmation="no"
@@ -65,8 +64,7 @@ function mongo-restore {
         skip_confirmation="yes"
         ;;
       *)
-        echo_error "Unknown option: ${key}"
-        exit 1
+        echo_warning "Unknown option: ${key}"
         ;;
     esac
 
