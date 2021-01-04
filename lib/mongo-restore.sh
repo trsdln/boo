@@ -26,11 +26,11 @@ EOF
   printf "${_db_restore_status_msg} "
 }
 
-function db-restore_help {
+function mongo-restore_help {
   cat << EOF
 This script enables restoring of database from local project directory to remote server
 
-boo db-restore server_name_from server_name_to [--no-drop|-D] [-v|--verbose] [--yes-im-sure|-Y]
+boo mongo-restore server_name_from server_name_to [--no-drop|-D] [-v|--verbose] [--yes-im-sure|-Y]
 
 Options:
 --no-drop|-D     - prevent all collections drop before dump restore
@@ -39,7 +39,7 @@ Options:
 EOF
 }
 
-function db-restore {
+function mongo-restore {
   local server_name_from=$1
   local server_name_to=$2
 

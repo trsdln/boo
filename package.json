@@ -1,6 +1,6 @@
 {
   "name": "boo",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "MongoDB Scripts Toolkit",
   "main": "boo.sh",
   "bin": {

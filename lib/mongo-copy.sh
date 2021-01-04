@@ -1,22 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 require_app_root_dir
 
 LOCAL_MONGO_URL="mongodb://localhost:27017/meteor"
 DUMP_ROOT_FOLDER="./.dump"
 
-function db-copy_help {
+function mongo-copy_help {
   cat << EOF
 Copy remote database
 
-boo db-copy server_name [-v|--verbose]
+boo mongo-copy server_name [-v|--verbose]
 
 Options:
 -v  - verbose mode (print all logs)
 EOF
 }
 
-function db-copy {
+function mongo-copy {
   local server_name=$1
   source_deploy_conf ${server_name}
 
