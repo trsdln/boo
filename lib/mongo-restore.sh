@@ -122,6 +122,12 @@ function mongo-restore {
   local restore_res=$?
 
   if [ "$restore_res" == "0" ]; then
+    local post_dump_hook="$BOO_CONFIG_ROOT/${server_name_from}/post-dump.js"
+    if [ -f "${post_dump_hook}" ]; then
+      echo_warning "Executing post dump hook..."
+      mongo "${MONGO_URL}" "${post_dump_hook}"
+    fi
+
     echo_success "'${server_name_from}' database successfully restored to '${SERVER_DESCRIPTION}'!"
   else
     echo_error "Failed to restore DB! Use -v flag to get more info."
