@@ -16,6 +16,11 @@ function mongo {
 
   source_deploy_conf ${server_name}
 
+  # if running script ask for confirmation
+  if [ ! -z "${2+x}" ] && [ -f "${2}" ]; then
+    confirm_production_operation "${server_name}" "${2}"
+  fi
+
   echo "Connecting to database of ${server_name}..."
 
   # "which" prevents self invocation

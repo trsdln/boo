@@ -112,3 +112,17 @@ function get_db_name_by_mongo_url {
   # naive implementation (doesn't handle ?arg=val cases)
   echo "${url##*/}"
 }
+
+confirm_production_operation() {
+  local target_env=$1
+  local description=$2
+  if [ "${target_env}" = "production" ]; then
+    echo_error "    You're trying to perform ${description} at **production**. Are you sure? (yes/NO)"
+    read CONFIRM
+
+    if [ "${CONFIRM}" != "yes" ]; then
+      echo_error "Operation aborted!"
+      exit 1
+    fi
+  fi
+}
