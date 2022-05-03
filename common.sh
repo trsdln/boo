@@ -72,7 +72,7 @@ function source_config_file {
 
 function source_deploy_conf {
   if [ -z ${1+x} ]; then
-     echo_error "Server isn't specified!"
+     echo_error "Server isn't specified! Run 'boo help ${ACTION_NAME}' for details."
      exit 1
   fi
 

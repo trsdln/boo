@@ -64,5 +64,7 @@ source_boorc
 
 # split action name and action arguments
 ACTION_NAME=$1
+shift
+
 ALL_ARGS="$@"
-execute_action ${BOO_ROOT_PATH} ${ACTION_NAME} "${ALL_ARGS#* }"
+execute_action ${BOO_ROOT_PATH} ${ACTION_NAME} "${ALL_ARGS}"
