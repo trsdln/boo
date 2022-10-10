@@ -17,7 +17,7 @@ ${COLOR_ERROR}${TEXT_BOLD}
 ######################################
 ${COLOR_DEFAULT}
 Server: ${SERVER_FROM_DESCRIPTION} -> ${SERVER_DESCRIPTION}
-URL: ${TEXT_UNDERLINE}${ROOT_URL}${COLOR_DEFAULT}
+
 Drop enabled: ${TEXT_BOLD}${COLOR_ERROR}${drop_enabled}${COLOR_DEFAULT}
 
 Are you sure? (Enter 'yes' to continue):
