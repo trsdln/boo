@@ -2,17 +2,13 @@
 
 require_app_root_dir
 
-LOCAL_MONGO_URL="mongodb://localhost:27017/meteor"
 DUMP_ROOT_FOLDER="./.dump"
 
 function mongo-copy_help {
   cat << EOF
 Copy remote database
 
-boo mongo-copy server_name [-v|--verbose]
-
-Options:
--v  - verbose mode (print all logs)
+boo mongo-copy server_name
 EOF
 }
 
@@ -20,7 +16,6 @@ function mongo-copy {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  local output_stream=/dev/null
   local run_post_hook=1
 
   # parse script arguments
@@ -28,9 +23,6 @@ function mongo-copy {
     local key="$2"
 
     case ${key} in
-      -v|--verbose)
-        output_stream="/dev/stdout"
-        ;;
       *)
         echo_error "Unknown option ${key}"
         exit 1
@@ -54,7 +46,7 @@ function mongo-copy {
     --forceTableScan \
     ${CUSTOM_MONGODUMP_FLAGS} \
     --uri "${MONGO_URL}" \
-    --out "${DUMP_ROOT_FOLDER}" &> ${output_stream}
+    --out "${DUMP_ROOT_FOLDER}"
   local copy_res=$?
 
   if [ "$copy_res" == "0" ]; then

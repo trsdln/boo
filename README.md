@@ -48,40 +48,28 @@ OWNER_ID="glaxy_organization_name"
 boo <action> [configuration-name] [addtional_keys]
 ```
 
-## Features
-
-* `boo db-copy <config-name>` save specified environment DB dump at
-  `./.dump`;
-* `boo db-restore <config-name-from> <config-name-to>` restore locally stored from DB to specified database at `<config-name-to>`;
-* `boo mongo <configuration-name>` open Mongo shell by server name;
-* `boo build <configuration-name>` builds Meteor's Web, iOS (opens in Xcode) and Android (signs and optionally installs on device) apps;
-* `boo run <configuration-name>` starts with application with specified configuration. If `ROOT_URL` is defined then it will be used as Meteor's `--mobile-server`;
-* `boo clean` remove app's build cache (similar to `meteor reset`, but doesn't remove database);
-* `boo help <action-name>` prints short help about specified action.
-
-## boo deploy (Legacy)
-
-Usage:
-
-```
-boo deploy <configuration-name>
-```
-
-Supports:
-
-* Heroku (requires Heroku Toolbelt)
-* AWS (requires Mupx)
-* Galaxy
-
 ## Custom actions
 
 You can define your own actions as bash functions at `./conf/boo-actions.conf`.
 
 #### Tested on:
 
-* Mac OS X
+* MacOS
+* Arch Linux
 
 ## Changelog
+
+#### 5.0.0
+
+- [x] __breaking change__: replaced `mongo` with `mongosh` to support MongoDB
+  6+
+- [x] __breaking change__: removed MongoDB dev server command
+- [x] removed `--verbose` flag support from `mongo-copy`/`mongo-restore` actions.
+  Now those are verbose by default
+
+#### 4.0.0
+
+- [x] added PostgreSQL support: `sql`, `sql-copy`, `sql-restore`
 
 #### 3.0.0
 

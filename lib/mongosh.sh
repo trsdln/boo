@@ -6,11 +6,11 @@ function mongo_help {
   cat << EOF
 Open MongoDB shell to remote server
 
-boo mongo server_name
+boo mongosh server_name
 EOF
 }
 
-function mongo {
+function mongosh {
   local server_name=$1
   local mongo_command_args="${@:2}"
 
@@ -24,5 +24,5 @@ function mongo {
   echo "Connecting to database of ${server_name}..."
 
   # "which" prevents self invocation
-  $(which mongo) "${MONGO_URL}" ${mongo_command_args}
+  $(which mongosh) "${MONGO_URL}" ${mongo_command_args}
 }

@@ -30,11 +30,10 @@ function mongo-restore_help {
   cat << EOF
 This script enables restoring of database from local project directory to remote server
 
-boo mongo-restore server_name_from server_name_to [--no-drop|-D] [--verbose|-v] [--yes-im-sure|-Y]
+boo mongo-restore server_name_from server_name_to [--no-drop|-D] [--yes-im-sure|-Y]
 
 Options:
 -D|--no-drop     - prevent all collections drop before dump restore
--v|--verbose     - verbose mode (print all logs)
 -Y|--yes-im-sure - prevent confirmation
 EOF
 }
@@ -45,7 +44,6 @@ function mongo-restore {
 
   local drop_flag='--drop'
   local skip_confirmation="no"
-  local output_stream=/dev/null
 
   shift # skip server_name_to
 
@@ -56,9 +54,6 @@ function mongo-restore {
     case ${key} in
       --no-drop|-D)
         drop_flag=''
-        ;;
-      -v|--verbose)
-        output_stream=/dev/stdout
         ;;
       -Y|--yes-im-sure)
         skip_confirmation="yes"
@@ -100,24 +95,22 @@ function mongo-restore {
   if [ "${drop_flag}" != '' ]; then
     echo_warning "Dropping old DB..."
     # otherwise old DB's collections will be kept if new dump doesn't contain those
-    mongo --eval="db.getCollectionNames().forEach(coll => db.getCollection(coll).drop())" \
-      "${MONGO_URL}" > "${output_stream}"
+    mongosh --quiet --eval="db.getCollectionNames().forEach(coll => db.getCollection(coll).drop())" \
+      "${MONGO_URL}" || exit 1
   fi
 
   echo "Restoring database from dump..."
 
-  # probably bug at mongorestore requires specify --db separately
   mongorestore "${drop_flag}" \
     --uri "${MONGO_URL}" \
-    --db "$(get_db_name_by_mongo_url ${MONGO_URL})" \
-    --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}" &> "${output_stream}"
+    --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
   local restore_res=$?
 
   if [ "$restore_res" == "0" ]; then
     local post_dump_hook="$BOO_CONFIG_ROOT/${server_name_from}/post-dump.js"
     if [ -f "${post_dump_hook}" ]; then
       echo_warning "Executing post dump hook..."
-      mongo "${MONGO_URL}" "${post_dump_hook}"
+      mongosh --quiet "${MONGO_URL}" "${post_dump_hook}" || exit 1
     fi
 
     echo_success "'${server_name_from}' database successfully restored to '${SERVER_DESCRIPTION}'!"
