@@ -109,8 +109,8 @@ function source_boorc {
 
 function get_db_name_by_mongo_url {
   local url=$1
-  # naive implementation (doesn't handle ?arg=val cases)
-  echo "${url##*/}"
+  local url_suffix="${url##*/}"
+  echo "${url%%\?*}"
 }
 
 confirm_production_operation() {
