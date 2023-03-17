@@ -110,7 +110,7 @@ function source_boorc {
 function get_db_name_by_mongo_url {
   local url=$1
   local url_suffix="${url##*/}"
-  echo "${url%%\?*}"
+  echo "${url_suffix%%\?*}"
 }
 
 confirm_production_operation() {
