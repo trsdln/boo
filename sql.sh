@@ -32,15 +32,15 @@ start_sql_proxy() {
     ensure_sql_proxy_bin_exists
 
     echo "Starting ${POSTGRES_INSTANCE} proxy..."
-    "${sql_proxy_bin}" -verbose=false -instances="${POSTGRES_INSTANCE}=tcp:${POSTGRES_PROXY_PORT}" &
+    "${sql_proxy_bin}" -verbose=true -instances="${POSTGRES_INSTANCE}=tcp:${POSTGRES_PROXY_PORT}" &
     sql_proxy_pid=$!
 
     echo "Waiting for proxy to start..."
-    sleep 5
+    sleep 10
 
     # check if proxy is running
-    kill -0 "${sql_proxy_pid}" &> /dev/null
-    if [ "$?" = "0" ]; then
+    curl "http://127.0.0.1:${POSTGRES_PROXY_PORT}" &>/dev/null
+    if [ "$?" = "52" ]; then
       # proxy started
       echo_success "Proxy started successfully"
     else
