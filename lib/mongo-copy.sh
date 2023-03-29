@@ -40,10 +40,7 @@ function mongo-copy {
   rm -rf "${dump_folder}"
   echo "Making remote database dump. Please, wait..."
 
-  # Force table scan fixes incompatibility problem between 4.x and 3.x
-  # https://dba.stackexchange.com/a/226541
   mongodump \
-    --forceTableScan \
     ${CUSTOM_MONGODUMP_FLAGS} \
     --uri "${MONGO_URL}" \
     --out "${DUMP_ROOT_FOLDER}"
@@ -52,7 +49,7 @@ function mongo-copy {
   if [ "$copy_res" == "0" ]; then
     echo_success "'${server_name}' database is successfully copied!"
   else
-    echo_error "Failed to copy '${server_name}' DB! Use -v flag to get more info."
+    echo_error "Failed to copy '${server_name}' DB!"
     exit $copy_res
   fi
 }

@@ -115,7 +115,7 @@ function mongo-restore {
 
     echo_success "'${server_name_from}' database successfully restored to '${SERVER_DESCRIPTION}'!"
   else
-    echo_error "Failed to restore DB! Use -v flag to get more info."
+    echo_error "Failed to restore DB!"
     exit $restore_res
   fi
 }
