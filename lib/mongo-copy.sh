@@ -2,8 +2,6 @@
 
 require_app_root_dir
 
-DUMP_ROOT_FOLDER="./.dump"
-
 function mongo-copy_help {
   cat << EOF
 Copy remote database
@@ -34,7 +32,7 @@ function mongo-copy {
 
   printf "Selected database of '${COLOR_SUCCESS}${SERVER_DESCRIPTION}${COLOR_DEFAULT}'\n"
 
-  local dump_folder="${DUMP_ROOT_FOLDER}/$(get_db_name_by_mongo_url ${MONGO_URL})"
+  local dump_folder="${BOO_DB_DUMP_DIR}/$(get_db_name_by_mongo_url ${MONGO_URL})"
 
   # refresh dump
   rm -rf "${dump_folder}"
@@ -43,7 +41,7 @@ function mongo-copy {
   mongodump \
     ${CUSTOM_MONGODUMP_FLAGS} \
     --uri "${MONGO_URL}" \
-    --out "${DUMP_ROOT_FOLDER}"
+    --out "${BOO_DB_DUMP_DIR}"
   local copy_res=$?
 
   if [ "$copy_res" == "0" ]; then

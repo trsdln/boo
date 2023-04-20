@@ -73,7 +73,7 @@ function sql-restore {
 
   . ${BOO_ROOT_PATH}/sql.sh
 
-  local dump_file="${dump_dir}/${server_name_from}.sql"
+  local dump_file=$(sql_dump_file_path ${server_name_from})
 
   if [ ! -f "${dump_file}" ]; then
     echo_error "Error: file ${dump_file} not found"

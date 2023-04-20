@@ -21,7 +21,8 @@ function sql-copy {
   start_sql_proxy
 
   echo "Making DB copy..."
-  pg_dump "${POSTGRE_PROXY_URL}" > "${dump_dir}/${server_name}.sql"
+  local dump_file=$(sql_dump_file_path ${server_name})
+  pg_dump "${POSTGRE_PROXY_URL}" > "${dump_file}"
   exit_res="$?"
 
   stop_sql_proxy

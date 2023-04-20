@@ -91,14 +91,6 @@ function source_deploy_conf {
   source_config_file ${config_file}
 }
 
-function require_meteor_root_dir {
-  # ensure we are at Meteor's root dir
-  if [ ! -d .meteor ]; then
-    echo_error "Error: '$(pwd)' is not a Meteor's project root directory ('.meteor' is missing)!"
-    exit 1
-  fi
-}
-
 function require_app_root_dir {
   # ensure we are at project's root dir
   if [ ! -d "${BOO_CONFIG_ROOT}" ]; then
@@ -108,6 +100,8 @@ function require_app_root_dir {
 }
 
 function source_boorc {
+  BOO_DB_DUMP_DIR="./.dump"
+
   local boo_rc_file="./.boorc"
   if [[ -f "${boo_rc_file}" ]]; then
     . ${boo_rc_file}

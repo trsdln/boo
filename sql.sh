@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-dump_dir=.dump/sql
-sql_proxy_bin="${dump_dir}/cloud_sql_proxy"
+sql_dump_dir=${BOO_DB_DUMP_DIR}/sql
+sql_proxy_bin="${sql_dump_dir}/cloud_sql_proxy"
 
 POSTGRE_PROXY_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PROXY_PORT}/${POSTGRES_DB}"
 
 ensure_sql_proxy_bin_exists() {
   if [ ! -f "${sql_proxy_bin}" ]; then
-    mkdir -p ${dump_dir}
+    mkdir -p ${sql_dump_dir}
 
     echo "Downloading proxy binary"
     local current_arch="$([ "${OSTYPE}" = "linux-gnu" ] && echo "linux" || echo "darwin")"
@@ -57,4 +57,9 @@ stop_sql_proxy() {
     kill_res=$?
     echo "Stopping sql proxy (code=${kill_res})"
   fi
+}
+
+sql_dump_file_path() {
+  local server_name=$1
+  echo "${sql_dump_dir}/${server_name}.sql"
 }

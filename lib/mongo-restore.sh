@@ -2,8 +2,6 @@
 
 require_app_root_dir
 
-DUMP_ROOT_DIR="./.dump"
-
 function print_restore_status {
   local drop_flag=$1
   local drop_enabled=$([[ ${drop_flag} == "" ]] && echo "NO" || echo "YES")
@@ -103,7 +101,7 @@ function mongo-restore {
   mongorestore "${drop_flag}" \
     --uri "${MONGO_URL}" \
     --nsExclude 'admin.system.*' \
-    --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
+    --noIndexRestore "${BOO_DB_DUMP_DIR}/${server_from_db_name}"
   local restore_res=$?
 
   if [ "$restore_res" = 0 ]; then
