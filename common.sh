@@ -41,24 +41,34 @@ function on_error {
 trap 'on_error ${LINENO}' ERR
 
 
-function source_config_file {
+function resolve_config_file_path {
   local config_file=${BOO_CONFIG_ROOT}/$1
 
-  if [ ! -f "${config_file}" ]; then
-    # try to find custom server root path sourced from .boorc
-    local server_name="${1%%/*}"
-    if [ "$server_name" != "${1}" ]; then
-      local server_root_env_name="boo_${server_name}_config_root"
-      local alt_config_file="${!server_root_env_name}/${1#*/}"
-      if [ -f "${alt_config_file}" ]; then
-        local config_file="${alt_config_file}"
-      fi
+  if [ -f "${config_file}" ]; then
+    echo "${config_file}"
+    return
+  fi
+
+  if [ ! -z ${BOO_ALTERNATIVE_CONFIG_ROOT+x} ]; then
+    local alt_config_file=${BOO_ALTERNATIVE_CONFIG_ROOT}/$1
+    if  [ -f "${alt_config_file}" ]; then
+      echo "${alt_config_file}"
+      return
     fi
   fi
 
+  return 1
+}
+
+
+function source_config_file {
+  local config_file
+  config_file=$(resolve_config_file_path "${1}")
+  local resolve_code=$?
+
   local silent=$2
 
-  if [ -f ${config_file} ]; then
+  if [ "${resolve_code}" = 0 ]; then
     [[ ${silent} != 'silent' ]] && echo "Using configuration ${config_file}"
     . ${config_file} # source config file
   else

@@ -76,7 +76,6 @@ function mongo-restore {
   source_deploy_conf ${server_name_to}
 
   # confirmation
-
   if [ "${skip_confirmation}" != "yes" ]; then
     # first get confirmation... just in case :)
     print_restore_status ${drop_flag}
@@ -107,9 +106,11 @@ function mongo-restore {
     --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
   local restore_res=$?
 
-  if [ "$restore_res" == "0" ]; then
-    local post_dump_hook="$BOO_CONFIG_ROOT/${server_name_from}/post-dump.js"
-    if [ -f "${post_dump_hook}" ]; then
+  if [ "$restore_res" = 0 ]; then
+    local post_dump_hook
+    post_dump_hook=$(resolve_config_file_path "${server_name_from}/post-dump.js")
+
+    if [ "$?" = 0 ]; then
       echo_warning "Executing post dump hook..."
       mongosh --quiet "${MONGO_URL}" "${post_dump_hook}" || exit 1
     fi
