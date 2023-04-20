@@ -95,7 +95,7 @@ function mongo-restore {
   if [ "${drop_flag}" != '' ]; then
     echo_warning "Dropping old DB..."
     # otherwise old DB's collections will be kept if new dump doesn't contain those
-    mongosh --quiet --eval="db.getCollectionNames().forEach(coll => db.getCollection(coll).drop())" \
+    mongosh --quiet --eval="db.getCollectionNames().filter(coll => coll !== 'system.views').forEach(coll => db.getCollection(coll).drop())" \
       "${MONGO_URL}" || exit 1
   fi
 
@@ -103,6 +103,7 @@ function mongo-restore {
 
   mongorestore "${drop_flag}" \
     --uri "${MONGO_URL}" \
+    --nsExclude 'admin.system.*' \
     --noIndexRestore "${DUMP_ROOT_DIR}/${server_from_db_name}"
   local restore_res=$?
 
