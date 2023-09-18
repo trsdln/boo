@@ -16,9 +16,7 @@ Looks for configurations at `../config/<configuration-name>` or where `BOO_CONFI
 ## Installation
 
 ```
-git clone https://github.com/trsdln/boo.git
-cd boo
-npm install -g $(pwd)
+npm install -g https://github.com/trsdln/boo.git
 ```
 
 ## Configuration example
@@ -64,6 +62,14 @@ You can define your own actions as bash functions at `./conf/boo-actions.conf`.
 
 - MacOS
 - Arch Linux
+
+## Development
+
+```
+git clone git@github.com:trsdln/boo.git
+cd boo
+npm install -g $(pwd)
+```
 
 ## Changelog
 
