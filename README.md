@@ -2,16 +2,24 @@
 
 Features:
 
-* Multiple configurations support
-* Multiple deployment environment support
-* Additional useful actions that work at context of specific server
-* Custom actions support
+- Multiple configurations support
+- Multiple deployment environment support
+- Additional useful actions that work at context of specific server
+- Custom actions support
 
 Super useful for lazy people: configured once - use any time.
 
 Some commands should be executed from Meteor project's root directory (where `.meteor` is located).
 
 Looks for configurations at `../config/<configuration-name>` or where `BOO_CONFIG_ROOT` from `.boorc` points to.
+
+## Installation
+
+```
+git clone https://github.com/trsdln/boo.git
+cd boo
+npm install -g $(pwd)
+```
 
 ## Configuration example
 
@@ -54,18 +62,18 @@ You can define your own actions as bash functions at `./conf/boo-actions.conf`.
 
 #### Tested on:
 
-* MacOS
-* Arch Linux
+- MacOS
+- Arch Linux
 
 ## Changelog
 
 #### 5.0.0
 
-- [x] __breaking change__: replaced `mongo` with `mongosh` to support MongoDB
-  6+
-- [x] __breaking change__: removed MongoDB dev server command
+- [x] **breaking change**: replaced `mongo` with `mongosh` to support MongoDB
+      6+
+- [x] **breaking change**: removed MongoDB dev server command
 - [x] removed `--verbose` flag support from `mongo-copy`/`mongo-restore` actions.
-  Now those are verbose by default
+      Now those are verbose by default
 
 #### 4.0.0
 
@@ -73,10 +81,10 @@ You can define your own actions as bash functions at `./conf/boo-actions.conf`.
 
 #### 3.0.0
 
-- [x] __breaking change__: simplify `db-*` scripts to do single action at a time (gives more
-  flexibility). Old vs. new:
-  * `boo db-copy test` => `boo db-copy test && boo db-restore test
-  local -Y`
-  * `boo db-restore test` => `boo db-copy local && boo db-restore
-  local test -Y`
+- [x] **breaking change**: simplify `db-*` scripts to do single action at a time (gives more
+      flexibility). Old vs. new:
+  - `boo db-copy test` => `boo db-copy test && boo db-restore test
+local -Y`
+  - `boo db-restore test` => `boo db-copy local && boo db-restore
+local test -Y`
 - [x] add `--yes-im-sure` flag to `db-restore` script
