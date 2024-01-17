@@ -87,7 +87,7 @@ function source_deploy_conf {
   fi
 
   local server_name=$1
-  local config_file=${server_name}/deploy.conf
+  local config_file=${server_name}/boo.conf
   source_config_file ${config_file}
 }
 

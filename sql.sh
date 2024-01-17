@@ -3,8 +3,6 @@
 sql_dump_dir=${BOO_DB_DUMP_DIR}/sql
 sql_proxy_bin="${sql_dump_dir}/cloud_sql_proxy"
 
-POSTGRE_PROXY_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PROXY_PORT}/${POSTGRES_DB}"
-
 ensure_sql_proxy_bin_exists() {
   if [ ! -f "${sql_proxy_bin}" ]; then
     mkdir -p ${sql_dump_dir}

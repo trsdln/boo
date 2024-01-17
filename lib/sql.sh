@@ -21,7 +21,7 @@ function sql {
   start_sql_proxy
 
   echo "Connecting to proxy..."
-  psql "${POSTGRE_PROXY_URL}" ${psql_command_args}
+  psql "${POSTGRES_URL}" ${psql_command_args}
 
   stop_sql_proxy
 }

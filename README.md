@@ -29,7 +29,7 @@ npm install -g https://github.com/trsdln/boo.git
 }
 ```
 
-`../config/production/deploy.conf`:
+`../config/production/boo.conf`:
 
 ```
 # Deployment configuration example for Meteor Galaxy server

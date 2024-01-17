@@ -94,7 +94,7 @@ function sql-restore {
   fi
 
   echo "Restoring dump..."
-  psql --no-psqlrc "${POSTGRE_PROXY_URL}" < "${dump_file}"
+  psql --no-psqlrc "${POSTGRES_URL}" < "${dump_file}"
 
   exit_res="$?"
 
