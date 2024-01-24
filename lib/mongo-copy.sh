@@ -14,8 +14,6 @@ function mongo-copy {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  local run_post_hook=1
-
   # parse script arguments
   while [[ $(($#-1)) -gt 0 ]]; do
     local key="$2"

@@ -110,7 +110,8 @@ function mongo-restore {
 
     if [ "$?" = 0 ]; then
       echo_warning "Executing post dump hook..."
-      mongosh --quiet "${MONGO_URL}" "${post_dump_hook}" || exit 1
+      cd $(dirname $post_dump_hook)
+      mongosh --quiet "${MONGO_URL}" "$(basename ${post_dump_hook})" || exit 1
     fi
 
     echo_success "'${server_name_from}' database successfully restored to '${SERVER_DESCRIPTION}'!"
