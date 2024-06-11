@@ -54,7 +54,8 @@ function sql-restore {
     shift # past argument or value
   done
 
-  source_deploy_conf ${server_name_to}
+  . ${BOO_ROOT_PATH}/sql.sh
+  source_deploy_conf_for_sql "${server_name_to}"
 
   if [ "${skip_confirmation}" != "yes" ]; then
     # first get confirmation... just in case :)
@@ -71,7 +72,6 @@ function sql-restore {
   # double confirmation for production
   confirm_production_operation "${server_name_to}" "restore DB"
 
-  . ${BOO_ROOT_PATH}/sql.sh
 
   local dump_file=$(sql_dump_file_path ${server_name_from})
 

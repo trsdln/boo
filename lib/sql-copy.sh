@@ -14,9 +14,8 @@ EOF
 function sql-copy {
   local server_name=$1
 
-  source_deploy_conf ${server_name}
-
   . ${BOO_ROOT_PATH}/sql.sh
+  source_deploy_conf_for_sql "${server_name}"
 
   start_sql_proxy
 

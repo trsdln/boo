@@ -14,9 +14,8 @@ function sql {
   local server_name=$1
   local psql_command_args="${@:2}"
 
-  source_deploy_conf ${server_name}
-
   . ${BOO_ROOT_PATH}/sql.sh
+  source_deploy_conf_for_sql "${server_name}"
 
   start_sql_proxy
 

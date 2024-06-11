@@ -70,3 +70,8 @@ sql_dump_file_path() {
   local server_name=$1
   echo "${sql_dump_dir}/${server_name}.sql"
 }
+
+source_deploy_conf_for_sql() {
+  PGUSER=$(gcloud config list account --format "value(core.account)")
+  source_deploy_conf "${1}"
+}
