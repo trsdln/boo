@@ -1,16 +1,25 @@
 #!/usr/bin/env bash
 
 sql_dump_dir=${BOO_DB_DUMP_DIR}/sql
-sql_proxy_bin="${sql_dump_dir}/cloud_sql_proxy"
+sql_proxy_bin="${sql_dump_dir}/cloud-sql-proxy"
 
 ensure_sql_proxy_bin_exists() {
   if [ ! -f "${sql_proxy_bin}" ]; then
     mkdir -p ${sql_dump_dir}
 
-    echo "Downloading proxy binary"
-    local current_arch="$([ "${OSTYPE}" = "linux-gnu" ] && echo "linux" || echo "darwin")"
-    curl -o "${sql_proxy_bin}" "https://dl.google.com/cloudsql/cloud_sql_proxy.${current_arch}.amd64"
-    chmod +x ${sql_proxy_bin}
+    local current_os="$([ "${OSTYPE}" = "linux-gnu" ] && echo "linux" || echo "darwin")"
+    local current_arch="amd64"
+
+    # support only Apple ARM
+    if [ "${current_os}" = "darwin" ] && [ "$(arch)" = "arm64" ]; then
+      current_arch="arm64"
+    fi
+
+    local binary_url="https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.3/cloud-sql-proxy.${current_os}.${current_arch}"
+    echo "Downloading proxy binary: ${binary_url}"
+
+    curl "${binary_url}" -o "${sql_proxy_bin}" || exit
+    chmod +x "${sql_proxy_bin}"
 
     if [ -f "${sql_proxy_bin}" ]; then
       echo_success "Binary saved at ${sql_proxy_bin}"
@@ -30,7 +39,7 @@ start_sql_proxy() {
     ensure_sql_proxy_bin_exists
 
     echo "Starting ${POSTGRES_INSTANCE} proxy..."
-    "${sql_proxy_bin}" -verbose=true -instances="${POSTGRES_INSTANCE}=tcp:${POSTGRES_PROXY_PORT}" &
+    "${sql_proxy_bin}" --auto-iam-authn --port="${POSTGRES_PROXY_PORT}" "${POSTGRES_INSTANCE}"  &
     sql_proxy_pid=$!
 
     echo "Waiting for proxy to start..."
