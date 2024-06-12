@@ -72,6 +72,8 @@ sql_dump_file_path() {
 }
 
 source_deploy_conf_for_sql() {
-  PGUSER=$(gcloud config list account --format "value(core.account)")
   source_deploy_conf "${1}"
+  PGUSER=$(gcloud config list account --format "value(core.account)")
+  PGUSER=$(node -p "encodeURIComponent('${PGUSER}').replace('.gserviceaccount.com','')")
+  POSTGRES_URL="postgresql://${PGUSER}@127.0.0.1:${POSTGRES_PROXY_PORT}/${POSTGRES_DB_NAME}"
 }
