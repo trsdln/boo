@@ -12,11 +12,11 @@ function echo_success {
 }
 
 function echo_warning {
-  printf "${COLOR_WARNING}${1}${COLOR_DEFAULT}\n"
+  printf "${COLOR_WARNING}${1}${COLOR_DEFAULT}\n" 1>&2
 }
 
 function echo_error {
-  printf "${COLOR_ERROR}${1}${COLOR_DEFAULT}\n"
+  printf "${COLOR_ERROR}${1}${COLOR_DEFAULT}\n" 1>&2
 }
 
 function test_echo_colors {
