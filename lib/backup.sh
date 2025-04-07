@@ -15,8 +15,10 @@ function backup {
   local server_name=$1
   source_deploy_conf ${server_name}
 
-  # additional configuration
-  source_config_file 'backup.conf'
+  if [ -f "$(resolve_config_file_path 'backup.conf')" ]; then
+    # additional configuration
+    source_config_file 'backup.conf'
+  fi
 
   local db_name=$(get_db_name_by_mongo_url ${MONGO_URL})
 
@@ -34,8 +36,10 @@ function backup {
   echo "Making backup ${backup_file_name}..."
   zip -r ${backup_file_name} ${mongo_dump_dir} ${sql_dump_file}
 
-  mkdir -p ${BACKUP_OUTPUT_PATH}
-  mv ${backup_file_name}  ${BACKUP_OUTPUT_PATH}/.
+  if [ ! -z ${BACKUP_OUTPUT_PATH+x} ]; then
+    mkdir -p ${BACKUP_OUTPUT_PATH}
+    mv ${backup_file_name}  ${BACKUP_OUTPUT_PATH}/.
+  fi
 
-  echo_success "Saved as ${BACKUP_OUTPUT_PATH}/${backup_file_name}"
+  echo_success "Saved as ${BACKUP_OUTPUT_PATH:-$BOO_DB_DUMP_DIR}/${backup_file_name}"
 }
