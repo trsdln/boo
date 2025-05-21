@@ -15,8 +15,9 @@ function db-copy {
   # arguments' "spreading"
   local all_args="$@"
 
-  # run sql first to prevent initialization
-  # of POSTGRES_INSTANCE variable
-  execute_action "${BOO_ROOT_PATH}" "sql-copy" "$all_args"
+  source_deploy_conf ${1}
+  if is_sql_configured; then
+    execute_action "${BOO_ROOT_PATH}" "sql-copy" "$all_args"
+  fi
   execute_action "${BOO_ROOT_PATH}" "mongo-copy" "$all_args"
 }

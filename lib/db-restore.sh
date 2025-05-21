@@ -15,8 +15,9 @@ function db-restore {
   # arguments' "spreading"
   local all_args="$@"
 
-  # run sql first to prevent initialization
-  # of POSTGRES_INSTANCE variable
-  execute_action "${BOO_ROOT_PATH}" "sql-restore" "$all_args"
+  source_deploy_conf ${2}
+  if is_sql_configured; then
+    execute_action "${BOO_ROOT_PATH}" "sql-restore" "$all_args"
+  fi
   execute_action "${BOO_ROOT_PATH}" "mongo-restore" "$all_args"
 }

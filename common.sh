@@ -130,3 +130,10 @@ confirm_production_operation() {
     fi
   fi
 }
+
+is_sql_configured() {
+  if [ ! -z "${POSTGRES_URL+x}" ] || [ ! -z "${POSTGRES_DB_NAME+x}" ]; then
+    return 0;
+  fi
+  return 1;
+}
