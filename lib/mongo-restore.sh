@@ -67,9 +67,8 @@ function mongo-restore {
   # collect configs data
 
   source_deploy_conf ${server_name_from}
-
+  unset MONGO_URL # just in case
   SERVER_FROM_DESCRIPTION=${SERVER_DESCRIPTION}
-  local server_from_db_name=$(get_db_name_by_mongo_url ${MONGO_URL})
 
   source_deploy_conf ${server_name_to}
 
@@ -101,7 +100,7 @@ function mongo-restore {
   mongorestore "${drop_flag}" \
     --uri "${MONGO_URL}" \
     --nsExclude 'admin.system.*' \
-    --noIndexRestore "${BOO_DB_DUMP_DIR}/${server_from_db_name}"
+    --noIndexRestore "${BOO_DB_DUMP_DIR}/${server_name_from}"
   local restore_res=$?
 
   if [ "$restore_res" = 0 ]; then

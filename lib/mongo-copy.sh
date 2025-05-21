@@ -30,7 +30,8 @@ function mongo-copy {
 
   printf "Selected database of '${COLOR_SUCCESS}${SERVER_DESCRIPTION}${COLOR_DEFAULT}'\n"
 
-  local dump_folder="${BOO_DB_DUMP_DIR}/$(get_db_name_by_mongo_url ${MONGO_URL})"
+  local initial_dump_folder="${BOO_DB_DUMP_DIR}/$(get_db_name_by_mongo_url ${MONGO_URL})"
+  local dump_folder="${BOO_DB_DUMP_DIR}/${server_name}"
 
   # refresh dump
   rm -rf "${dump_folder}"
@@ -43,6 +44,7 @@ function mongo-copy {
   local copy_res=$?
 
   if [ "$copy_res" == "0" ]; then
+    mv "${initial_dump_folder}" "${dump_folder}"
     echo_success "'${server_name}' database is successfully copied!"
   else
     echo_error "Failed to copy '${server_name}' DB!"
