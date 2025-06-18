@@ -20,10 +20,8 @@ function backup {
     source_config_file 'backup.conf'
   fi
 
-  local db_name=$(get_db_name_by_mongo_url ${MONGO_URL})
-
   cd ${BOO_DB_DUMP_DIR}
-  local mongo_dump_dir="${db_name}"
+  local mongo_dump_dir="${server_name}"
 
   local sql_dump_file="sql/${server_name}.sql"
   if [ ! -f "${sql_dump_file}" ]; then 
