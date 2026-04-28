@@ -37,11 +37,24 @@ function mongo-copy {
   rm -rf "${dump_folder}"
   echo "Making remote database dump. Please, wait..."
 
-  mongodump \
-    ${CUSTOM_MONGODUMP_FLAGS} \
-    --uri "${MONGO_URL}" \
-    --out "${BOO_DB_DUMP_DIR}"
-  local copy_res=$?
+  local copy_res=0
+  if [ "${#CUSTOM_MONGODUMP_FLAGS_ARRAY[@]}" -gt 0 ]; then
+    for flags_str in "${CUSTOM_MONGODUMP_FLAGS_ARRAY[@]}"; do
+      read -ra flags_array <<< "$flags_str"
+      mongodump \
+        "${flags_array[@]}" \
+        --uri "${MONGO_URL}" \
+        --out "${BOO_DB_DUMP_DIR}"
+      copy_res=$?
+      [ "$copy_res" != "0" ] && break
+    done
+  else
+    mongodump \
+      ${CUSTOM_MONGODUMP_FLAGS} \
+      --uri "${MONGO_URL}" \
+      --out "${BOO_DB_DUMP_DIR}"
+    copy_res=$?
+  fi
 
   if [ "$copy_res" == "0" ]; then
     mv "${initial_dump_folder}" "${dump_folder}"
