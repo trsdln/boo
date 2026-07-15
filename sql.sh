@@ -39,7 +39,7 @@ start_sql_proxy() {
     ensure_sql_proxy_bin_exists
 
     echo "Starting ${POSTGRES_INSTANCE} proxy..."
-    "${sql_proxy_bin}" --auto-iam-authn --port="${POSTGRES_PROXY_PORT}" "${POSTGRES_INSTANCE}"  &
+    "${sql_proxy_bin}" ${POSTGRES_PROXY_EXTRA_ARGS:-} --auto-iam-authn --port="${POSTGRES_PROXY_PORT}" "${POSTGRES_INSTANCE}"  &
     sql_proxy_pid=$!
 
     echo "Waiting for proxy to start..."
