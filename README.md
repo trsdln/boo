@@ -54,6 +54,23 @@ OWNER_ID="glaxy_organization_name"
 boo <action> [configuration-name] [addtional_keys]
 ```
 
+## SQL proxy options
+
+When connecting to a Cloud SQL instance, `boo` starts a local
+`cloud-sql-proxy`. You can pass extra flags to that proxy via the
+`POSTGRES_PROXY_EXTRA_ARGS` environment variable (set it in your `*.conf` file or
+shell). It is empty by default, so existing setups are unaffected.
+
+For example, to connect to an instance whose public IP is disabled (private IP
+only), route through the private IP:
+
+```
+POSTGRES_PROXY_EXTRA_ARGS="--private-ip"
+```
+
+Note: `--private-ip` only changes which instance IP the proxy dials — the host
+running `boo` still needs a network path into the VPC (e.g. VPN) to reach it.
+
 ## Custom actions
 
 You can define your own actions as bash functions at `./conf/boo-actions.conf`.
@@ -72,6 +89,11 @@ npm install -g $(pwd)
 ```
 
 ## Changelog
+
+#### 6.3.0
+
+- [x] added `POSTGRES_PROXY_EXTRA_ARGS` env var to pass extra flags to
+      `cloud-sql-proxy` (e.g. `--private-ip`)
 
 #### 5.0.0
 
